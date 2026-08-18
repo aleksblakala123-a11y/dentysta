@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8"/>
+    <title>Polityka prywatności | Amico Dental</title>
+    <meta content="Jak Amico Dental gromadzi, wykorzystuje i chroni dane pacjentów." name="description"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="assets/img/favicon.svg" rel="shortcut icon" type="image/svg+xml"/>
+    <link href="assets/img/webclip.png" rel="apple-touch-icon"/>
+    <style>
+        body{margin:0;background:#fafafa;color:#011f23;font-family:Sora,'Helvetica Neue',Arial,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+        .legal-nav{display:flex;align-items:center;justify-content:space-between;padding:24px 6vw;border-bottom:1px solid #e2e2e2;}
+        .legal-nav a.back{color:#24a3b1;text-decoration:none;font-weight:500;font-size:15px;}
+        .legal-wrap{max-width:760px;margin:0 auto;padding:64px 24px 96px;}
+        .legal-wrap h1{font-size:clamp(32px,5vw,48px);font-weight:600;letter-spacing:-1px;margin:0 0 8px;}
+        .legal-wrap .updated{color:#758696;font-size:14px;margin-bottom:40px;}
+        .legal-wrap h2{font-size:22px;font-weight:600;margin:40px 0 12px;}
+        .legal-wrap p,.legal-wrap li{color:#3a4a4d;font-size:16px;}
+        .legal-wrap a{color:#24a3b1;}
+        .legal-foot{text-align:center;padding:40px 24px;border-top:1px solid #e2e2e2;color:#758696;font-size:14px;}
+    </style>
+</head>
+<body>
+    <div class="legal-nav">
+        <a href="index.html"><img src="assets/img/amico-logo.svg" alt="Amico Dental logo" height="30"/></a>
+        <a class="back" href="index.html">&larr; Powrót do strony głównej</a>
+    </div>
+    <main class="legal-wrap">
+        <h1>Polityka prywatności</h1>
+        <p class="updated">Ostatnia aktualizacja: sierpień 2026</p>
+        <!-- TODO: CLIENT CONFIRMATION -- dane administratora do uzupełnienia: pełna nazwa działalności, NIP/REGON -->
+        <p>Administratorem danych osobowych jest Amico Dental, ul. Bronisława Ratajczaka 9/20/21, 21-040 Świdnik. Twoja prywatność i zaufanie są dla nas równie ważne jak Twój uśmiech. Niniejsza polityka wyjaśnia, jakie dane zbieramy podczas wizyty na stronie lub umawiania wizyty oraz jak je chronimy.</p>
+        <h2>Jakie dane zbieramy</h2>
+        <p>Podczas umawiania wizyty lub kontaktu z nami możemy zbierać Twoje imię i nazwisko, numer telefonu, adres e-mail oraz inne informacje, którymi zechcesz się z nami podzielić w związku z leczeniem. Zbieramy również podstawowe, anonimowe dane analityczne dotyczące korzystania ze strony, aby móc ją ulepszać.</p>
+        <h2>Jak wykorzystujemy dane</h2>
+        <ul>
+            <li>Do zaplanowania, potwierdzenia i obsługi wizyt.</li>
+            <li>Do odpowiedzi na pytania i zapewnienia opieki, o którą prosisz.</li>
+            <li>Do wysyłania przypomnień o wizytach oraz, wyłącznie za Twoją zgodą, okazjonalnych informacji o gabinecie.</li>
+        </ul>
+        <h2>Jak chronimy dane</h2>
+        <p>Traktujemy Twoje dane zdrowotne i kontaktowe jako poufne i przechowujemy je w bezpieczny sposób. Nigdy nie sprzedajemy danych osobowych. Udostępniamy je wyłącznie personelowi i systemom bezpośrednio zaangażowanym w opiekę nad Tobą lub gdy wymaga tego prawo.</p>
+        <h2>Twoje prawa</h2>
+        <p>Masz prawo w każdej chwili poprosić o dostęp do swoich danych, ich sprostowanie lub usunięcie, pisząc na adres <a href="mailto:amicodental@amicodental.pl">amicodental@amicodental.pl</a>. Możesz również w dowolnym momencie zrezygnować z komunikacji niezwiązanej bezpośrednio z leczeniem.</p>
+        <h2>Kontakt</h2>
+        <p>Masz pytania dotyczące tej polityki? Napisz do nas na adres <a href="mailto:amicodental@amicodental.pl">amicodental@amicodental.pl</a> lub zadzwoń pod numer <a href="tel:+48814580029">81 458 00 29</a>.</p>
+    </main>
+    <div class="legal-foot">&copy; 2026 Amico Dental. Wszelkie prawa zastrzeżone. &middot; <a href="terms.html" style="color:#758696;">Regulamin</a></div>
+
+<script>
+/* Amico image guard: any failed/empty image -> on-brand gradient SVG so nothing ever looks broken. */
+(function(){
+  function ph(label){
+    var t=(label||'Amico Dental').replace(/[<>&]/g,'').slice(0,22);
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">'
+     +'<defs><linearGradient id="lg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">'
+     +'<stop offset="0" stop-color="#24a3b1"/><stop offset="1" stop-color="#011f23"/></linearGradient></defs>'
+     +'<rect width="1280" height="720" fill="url(#lg)"/>'
+     +'<circle cx="640" cy="298" r="44" fill="#fff" opacity="0.9"/>'
+     +'<text x="640" y="436" fill="#fff" font-family="Sora,Arial" font-size="40" font-weight="600" text-anchor="middle" opacity="0.92">'+t+'</text></svg>';
+    return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+  }
+  function bind(im){
+    im.addEventListener('error',function(){ if(im.dataset.fbk)return; im.dataset.fbk='1'; im.src=ph(im.alt); });
+    if(im.complete && im.naturalWidth===0 && !im.dataset.fbk){ im.dataset.fbk='1'; im.src=ph(im.alt); }
+  }
+  document.querySelectorAll('img').forEach(bind);
+})();
+</script>
+</body>
+</html>
