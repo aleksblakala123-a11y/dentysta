@@ -1527,7 +1527,7 @@ textarea.w-input, textarea.w-select {
   background-repeat: no-repeat;
   background-size: 24px;
   width: 4em;
-  transition: all .3s;
+  transition: opacity .3s;
   position: absolute;
   top: 0;
 }
@@ -3670,7 +3670,7 @@ figure {
   grid-column-gap: var(--_size-variables---element-spacing--xl);
   grid-row-gap: var(--_size-variables---element-spacing--xl);
   grid-template-rows: auto;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-auto-columns: 1fr;
   max-width: 547px;
   display: grid;
@@ -4740,7 +4740,6 @@ figure {
   background-image: url("../img/69ddd539a343355970d2be89_testimonial-background.webp");
   background-position: 50% 100%;
   background-size: cover;
-  background-attachment: fixed;
 }
 
 .testimonial_block {
@@ -5934,8 +5933,8 @@ figure {
   grid-row-gap: var(--_size-variables---element-spacing--xs);
   border: 1px solid var(--color-shadow--white-20);
   border-radius: var(--_size-variables---border-radius--8xl);
-  -webkit-backdrop-filter: blur(60px);
-  backdrop-filter: blur(60px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   color: var(--primitive-color--neutral-0);
   line-height: var(--_font---line-height--150);
   letter-spacing: var(--_font---letter-spacing--0-32px);
@@ -9075,11 +9074,22 @@ figure {
 .lead-form_input:focus{border-color:var(--primitive-color--primary-500,#24a3b1);background:#fff;}
 .lead-form_btn{height:52px;border:none;border-radius:999px;background:var(--primitive-color--primary-900,#011f23);color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:transform .15s ease,background .2s ease;}
 .lead-form_btn:hover{background:var(--primitive-color--primary-500,#24a3b1);transform:translateY(-1px);}
+.lead-form_btn:disabled{background:#9aa6ad;cursor:not-allowed;transform:none;}
 .lead-form_note{font-size:12px;color:#9aa6ad;text-align:center;margin-top:2px;}
+.lead-form_hp{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.lead-form_consent{display:flex;align-items:flex-start;gap:8px;cursor:pointer;}
+.lead-form_consent input[type="checkbox"]{flex-shrink:0;width:16px;height:16px;margin-top:2px;accent-color:var(--primitive-color--primary-500,#24a3b1);}
+.lead-form_consent span{font-size:12px;line-height:1.5;color:#5d6c7b;}
+.lead-form_consent span a{color:var(--primitive-color--primary-500,#24a3b1);text-decoration:underline;}
+.lead-form_status{font-size:13px;line-height:1.5;min-height:0;}
+.lead-form_status:empty{display:none;}
+.lead-form_status.is-error{color:#c0392b;}
+.lead-form_status.is-info{color:#5d6c7b;}
+.lead-form_status.is-error a{color:#c0392b;font-weight:600;text-decoration:underline;}
 @media (max-width:991px){.lead-form_card{max-width:100%;}}
 
 /* ===== Closing CTA photo section + footer polish ===== */
-.section_cta{position:relative;background-image:linear-gradient(115deg, rgba(1,31,35,.93), rgba(1,31,35,.72)), url('../img/gen_about-hero-image.jpg');background-size:cover;background-position:center;}
+.section_cta{position:relative;background-image:linear-gradient(115deg, rgba(1,31,35,.93), rgba(1,31,35,.72)), url('../img/gen_about-hero-image.jpg');background-image:linear-gradient(115deg, rgba(1,31,35,.93), rgba(1,31,35,.72)), image-set(url('../img/opt/gen_about-hero-image-800w.webp') 1x, url('../img/opt/gen_about-hero-image-1200w.webp') 2x);background-size:cover;background-position:center;}
 .footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 
@@ -9105,6 +9115,7 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 /* ===== Testimonial card: greenery photo background + cyan overlay ===== */
 .testimonial-slider_card{
   background-image:linear-gradient(160deg, rgba(2,47,52,.86), rgba(28,150,165,.80)), url('../img/gen_testimonial-bg.jpg')!important;
+  background-image:linear-gradient(160deg, rgba(2,47,52,.86), rgba(28,150,165,.80)), image-set(url('../img/opt/gen_testimonial-bg-400w.webp') 1x, url('../img/opt/gen_testimonial-bg-800w.webp') 2x)!important;
   background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
 }
 .testimonial-slider_card, .testimonial-slider_card h1,.testimonial-slider_card h2,.testimonial-slider_card h3,
@@ -9114,7 +9125,7 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 .testimonial-slider_card .testimonial-author_image{border:3px solid rgba(255,255,255,.6);}
 
 /* ===== Team section: greenery clinic background + cyan overlay ===== */
-.section_team{background-image:url('../img/gen_team-bg.jpg')!important;background-size:cover!important;background-position:center!important;background-attachment:fixed;}
+.section_team{background-image:url('../img/gen_team-bg.jpg')!important;background-image:image-set(url('../img/opt/gen_team-bg-800w.webp') 1x, url('../img/opt/gen_team-bg-1200w.webp') 2x)!important;background-size:cover!important;background-position:center!important;}
 .section_team .home-team_header-title,.section_team .home-team_header-para{color:#ffffff!important;}
 .section_team .home-team_header-para{color:rgba(255,255,255,.85)!important;}
 .section_team .text-highlighted{color:#7fe3ef!important;}
@@ -9126,3 +9137,41 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 
 /* Safety: reveal/portrait/blog images must never stay blurred (no leftover IX2 blur) */
 .team_image,.blog-item_image,.our-story_image,.about-hero_image,.home-value_image{filter:none !important;-webkit-filter:none !important;}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== Team avatar placeholder (brak zdjecia - inicjaly w kole marki).
+   Siedzi w tym samym miejscu co docelowy <img class="team_image">, wewnatrz
+   .image-animation-scale. Wypelnia go tak jak wypelnialoby zdjecie (100%x100%),
+   wiec podmiana na prawdziwe zdjecie to tylko zamiana tego bloku na
+   <img class="team_image" .../> - bez zmian w CSS. ===== */
+.team-avatar_placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primitive-color--neutral-200, #e2f1f3);
+}
+.team-avatar_circle {
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: var(--primitive-color--primary-500, #24a3b1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--_font---font-family--primary, Sora, sans-serif);
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+}
