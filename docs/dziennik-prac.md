@@ -61,6 +61,7 @@ Kazdy blok ma komentarz z uzasadnieniem. Kolejnosc od gory:
 | ~9592 | Menu mobilne | blokada przewijania tla przez `:has()` (Webflow nie blokuje; atrybut `fs-scrolldisable-element="smart-nav"` jest w markupie, ale **skryptu Finsweet nie ma na stronie**); cel dotykowy hamburgera **24x18 -> 44x44 px**; linki menu 36 -> 48 px. |
 | ~9660 | Pasek nawigacji przyklejony | `position:absolute` -> **`fixed`**. `sticky` odpadl pomiarem: wraca do flow i spycha hero o **69 px** (h1 ze 104 na 173 px), a hero ma `padding-top:420px` wlasnie pod nachodzacy pasek. Tlo `primary-700` (#022f34) dopiero po przewinieciu, klasa `.is-scrolled` z IntersectionObservera. Kontrast linkow **13.32:1**, hamburgera i tekstu CTA **14.4:1**. Menu mobilne: overlay przyciety z **12 921 px** do wysokosci ekranu, panel siega dokladnie dolu (szczelina **0 px** na 10 viewportach). |
 | (HTML) | Skip link faktycznie pomija nawigacje | `<main>` dostal `tabindex="-1"` w **7 plikach** (tez privacy/terms/cookies - maja ten sam skip link). Na stronach prawnych to wystarczylo, na nawigacyjnych **nie**: `webflow.js` przechwytuje kotwice i przewija sam, wiec fokus zostawal na skip linku, a kolejny Tab **wracal do nawigacji**. Dolozone jawne `main.focus({preventScroll:true})`. Zmierzone na 7 stronach: fokus `MAIN#main`, nastepny Tab wchodzi w tresc. |
+| (HTML) | Pulapka fokusu w menu mobilnym | Po czterech linkach Tab wychodzil w tresc **pod** nieprzezroczystym panelem (formularz, stopka, karty lekarzy) - fokus na kontrolkach, ktorych nie widac. Rozwiazane przez `inert` na wszystkim poza `.navbar_wrap`, przelaczane MutationObserverem na klasie `.w--open`. Potwierdzone przez CDP: `<main>` ma `ignored=true, powod=inertElement`, wiec czytniki ekranu tez pomijaja tresc. Dolozony Escape na poziomie dokumentu dla przypadku, gdy fokus jest na `<body>`. |
 
 Zmiany w HTML: adres w stopce (4 pliki) + usuniety zduplikowany krotszy copyright.
 
@@ -83,6 +84,12 @@ w CSS, bo w samym HTML tego nie ma.
   Panel `absolute` przykryje `.navbar-button_wrapper` (`static`) i zablokuje klikniecia.
 - **Inline style po IX2:** Webflow raz, przy starcie, ustawia inline `opacity:0`, `height:0`,
   `transform`. Inline bije kazda regule CSS - trzeba je wyczyscic z JS na starcie.
+- **Webflow sam ustawia poprawne ARIA na hamburgerze**: `role="button"`, `tabindex="0"`,
+  `aria-label`, `aria-controls`, `aria-haspopup` i przelaczane `aria-expanded`. Nie trzeba
+  tego dopisywac - wystarczy nie zepsuc. Klasa `.w--open` na przycisku to najpewniejszy
+  hak stanu menu (uzywaja jej juz i CSS, i pulapka fokusu).
+- **Obsluga Escape w Webflow jest podpieta do nawigacji, nie do dokumentu.** Gdy fokus
+  wypadnie poza nawigacje, Escape przestaje zamykac menu.
 - **`webflow.js` przechwytuje linki-kotwice** (`href="#cos"`): robi `preventDefault`
   i przewija wlasnym kodem. Skutek uboczny: przegladarka **nie przenosi fokusu** do celu,
   wiec sam `tabindex="-1"` na celu nie naprawia skip linku. Trzeba wolac `.focus()` recznie.
@@ -113,8 +120,11 @@ w CSS, bo w samym HTML tego nie ma.
    Placeholder znika po wpisaniu znaku i bywa pomijany przez czytniki ekranu.
 4. **CSS wazy ~264 KB** przy budzecie 60 KB. Martwe reguly po Webflow.
 5. **Dane strukturalne (`Dentist`) tylko na `index.html`.** Podstrony ich nie maja.
-6. **Brak pulapki fokusu w menu mobilnym.** Przy otwartym menu tresc pod spodem zostaje
-   dostepna Tabem. Webflow tego nie robi, CSS nie naprawi.
+6. ~~**Brak pulapki fokusu w menu mobilnym.**~~ **ZROBIONE 2026-08-21.** `inert` na
+   wszystkim poza paskiem. Przy okazji sprostowanie do sekcji 4: Escape **nie** zamykal
+   menu "zawsze" - Webflow wiesza obsluge na nawigacji, wiec dzialal tylko dopoki fokus
+   nie uciekl w tresc. Po zalozeniu pulapki uciec juz nie moze, a dodatkowy nasluch
+   domyka przypadek fokusu na `<body>`.
 
 ---
 
@@ -124,6 +134,10 @@ Chromium + Playwright, viewporty **320 / 360 / 412 / 480 / 767 / 991 / 1200 / 14
 Mierz, nie ogladaj: `getBoundingClientRect`, `getComputedStyle`, `elementFromPoint`
 (czy element jest **naprawde** klikalny, a nie przykryty), `document.documentElement.scrollWidth`
 kontra `clientWidth` (poziomy scroll), kontrast liczony z **pikseli zrzutu** gdy tlem jest zdjecie.
+
+**`ariaSnapshot()` Playwrighta nie modeluje `inert`** - pokazuje tresc, ktora dla
+przegladarki jest juz poza drzewem dostepnosci. Do sprawdzenia `inert` uzywaj CDP:
+`Accessibility.getPartialAXTree` zwraca `ignored:true` z `ignoredReasons: inertElement`.
 
 **IntersectionObserver nie zadziala w karcie, ktora nie kompozytuje klatek.** Panel
 przegladarki schowany => `document.visibilityState==="hidden"`, `requestAnimationFrame`

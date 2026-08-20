@@ -854,6 +854,73 @@
     main.focus({ preventScroll: true });
   });
 })();
+
+/* Pulapka fokusu w otwartym menu mobilnym.
+   BYLO: po czterech linkach menu Tab wychodzil w tresc strony - formularz,
+   stopke, karty lekarzy. Te elementy leza POD nieprzezroczystym panelem,
+   wiec uzytkownik klawiatury fokusowal kontrolki, ktorych nie widzi.
+   Przy okazji psulo to Escape: Webflow wiesza obsluge na nawigacji, wiec
+   z fokusem gdzies w stopce Escape nie zamykal menu.
+
+   Zamiast recznego cyklowania Tabem ustawiamy `inert` na wszystkim poza
+   paskiem. Jedna wlasciwosc zalatwia i fokus, i drzewo dostepnosci
+   (czytniki ekranu tez pomijaja tresc pod spodem). Tabowalne zostaje
+   dokladnie to, co widac: logo, CTA (768-991 px) i hamburger w pasku
+   plus linki panelu.
+
+   Sam stan otwarcia czytamy z klasy .w--open, ktora dokBada Webflow -
+   tej samej, na ktorej opiera sie juz blokada przewijania w CSS.
+   Escape i przywrocenie fokusu na hamburger Webflow robi sam; sprawdzone,
+   ze dziala, gdy tylko fokus nie ucieknie poza nawigacje.
+
+   Bez wsparcia dla `inert` zachowanie zostaje jak dotychczas. To ten sam
+   prog co przy `:has()` uzytym do blokady przewijania tla. */
+(function () {
+  var nav = document.querySelector('.navbar_wrap');
+  var toggler = document.querySelector('.navbar-toggler-button');
+  if (!nav || !toggler || !('inert' in HTMLElement.prototype)) return;
+
+  function trap(on) {
+    if (on) {
+      var node = nav;
+      while (node && node !== document.body) {
+        var siblings = node.parentNode.children;
+        for (var i = 0; i < siblings.length; i++) {
+          if (siblings[i] === node) continue;
+          siblings[i].setAttribute('inert', '');
+          siblings[i].setAttribute('data-nav-inert', '');
+        }
+        node = node.parentNode;
+      }
+      return;
+    }
+    /* Zdejmujemy tylko to, co sami oznaczylismy - zeby nie skasowac
+       cudzego `inert`, gdyby kiedys pojawil sie na stronie. */
+    var marked = document.querySelectorAll('[data-nav-inert]');
+    for (var j = 0; j < marked.length; j++) {
+      marked[j].removeAttribute('inert');
+      marked[j].removeAttribute('data-nav-inert');
+    }
+  }
+
+  new MutationObserver(function () {
+    trap(toggler.classList.contains('w--open'));
+  }).observe(toggler, { attributes: true, attributeFilter: ['class'] });
+  /* Escape gdy fokus wypadl poza nawigacje.
+     Webflow wiesza swoja obsluge Escape na nawigacji. Zmierzone: z fokusem
+     na hamburgerze i na linku panelu dziala i sam przywraca fokus, ale gdy
+     fokus jest na <body> (np. po kliknieciu w puste tlo panelu) - nie.
+     Domykamy tylko ten przypadek; jesli fokus jest w pasku, oddajemy pole
+     Webflow, zeby nie przelaczyc menu dwa razy. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!toggler.classList.contains('w--open')) return;
+    if (document.activeElement && document.activeElement.closest('.navbar_wrap')) return;
+    toggler.click();
+    toggler.focus();
+  });
+
+})();
 </script>
 </body>
 </html>
