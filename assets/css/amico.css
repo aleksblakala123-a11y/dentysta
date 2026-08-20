@@ -9032,7 +9032,7 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 .testimonial-slider_card .testimonial-author_image{border:3px solid rgba(255,255,255,.6);}
 
 /* ===== Team section: greenery clinic background + cyan overlay ===== */
-.section_team{background-image:url('../img/gen_team-bg.jpg')!important;background-image:image-set(url('../img/opt/gen_team-bg-800w.webp') 1x, url('../img/opt/gen_team-bg-1200w.webp') 2x)!important;background-size:cover!important;background-position:center!important;}
+.section_team{background-image:url('../img/gen_team-bg.jpg')!important;background-image:image-set(url('../img/opt/gen_team-bg-800w.webp') 1x, url('../img/opt/gen_team-bg-1200w.webp') 2x)!important;background-size:cover!important;background-position:center!important;scroll-margin-top:88px;}
 .section_team .home-team_header-title,.section_team .home-team_header-para{color:#ffffff!important;}
 .section_team .home-team_header-para{color:rgba(255,255,255,.85)!important;}
 .section_team .text-highlighted{color:#7fe3ef!important;}

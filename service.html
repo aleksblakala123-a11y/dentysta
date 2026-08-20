@@ -1363,6 +1363,19 @@
                za darmo, klik przelacza aria-expanded i hidden na panelu. Zwiniety panel jest
                [hidden] (usuniety z DOM-u dostepnosci i z kolejnosci Tab), nie tylko opacity:0. */
             (function () {
+                /* Przegladarka sama probuje doscrollowac do fragmentu z URL-a podczas
+                   ladowania strony - i to wielokrotnie, w miare doladowywania zasobow oraz
+                   otwierania panelu (animacja 0.35s). Te natywne proby koliduja z naszym
+                   wlasnym scrollem i koncza sie na przypadkowej, za malej wartosci (np. 42px
+                   zamiast pelnych 88px scroll-margin-top). Usuwamy hash z URL-a natychmiast,
+                   zanim przegladarka zdazy go sama obsluzyc - odtad tylko nasz kod decyduje
+                   o scrollu, a hash przywracamy w URL-u (przez replaceState, ktore nie
+                   wywoluje kolejnej natywnej probyscrolla) juz po jego zakonczeniu. */
+                var initialHash = window.location.hash;
+                if (initialHash) {
+                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+
                 document.querySelectorAll('.service-item_wrap').forEach(function (wrap) {
                     var trigger = wrap.querySelector('.service-item_trigger');
                     var panel = wrap.querySelector('.service-item_body');
@@ -1410,11 +1423,11 @@
                 }
 
                 /* Kotwice do pojedynczych uslug: #profilaktyka, #ortodoncja itd. na
-                   .service-item_wrap. Przy wejsciu z takim hashem w URL-u (albo zmianie
-                   hasha bez przeladowania) rozwijamy wlasciwy panel i doscrollowujemy do
-                   niego, respektujac scroll-margin-top spod nawigacji. */
-                function openFromHash(smooth) {
-                    var hash = decodeURIComponent(window.location.hash.replace('#', ''));
+                   .service-item_wrap. Rozwija wlasciwy panel i doscrollowuje do niego,
+                   respektujac scroll-margin-top spod nawigacji, a na koniec przywraca hash
+                   w URL-u (bez wywolywania natywnej proby scrolla przegladarki). */
+                function openFromHash(rawHash, smooth) {
+                    var hash = decodeURIComponent((rawHash || '').replace('#', ''));
                     if (!hash) return;
                     var wrap = document.getElementById(hash);
                     if (!wrap || !wrap.classList.contains('service-item_wrap')) return;
@@ -1422,11 +1435,30 @@
                     var panel = wrap.querySelector('.service-item_body');
                     if (!trigger || !panel) return;
                     if (trigger.getAttribute('aria-expanded') !== 'true') openPanel(trigger, panel);
-                    wrap.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+                    /* scrollIntoView potrafi uznac, ze element jest "wystarczajaco" w widoku
+                       i nie doscrollowac az do pelnego scroll-margin-top, jesli poprzednia
+                       (choc niedokladna) proba zostawila go juz czesciowo widocznym. Liczymy
+                       docelowa pozycje sami, zeby zawsze trafic dokladnie pod nawigacje. */
+                    var rect = wrap.getBoundingClientRect();
+                    var marginTop = parseFloat(getComputedStyle(wrap).scrollMarginTop) || 0;
+                    var targetY = window.scrollY + rect.top - marginTop;
+                    window.scrollTo({ top: Math.max(0, targetY), behavior: smooth ? 'smooth' : 'auto' });
+                    history.replaceState(null, '', '#' + hash);
                 }
 
-                openFromHash(false);
-                window.addEventListener('hashchange', function () { openFromHash(true); });
+                if (initialHash) {
+                    openFromHash(initialHash, false);
+                    /* Zaraz po otwarciu panelu jeszcze przez chwile trwa reflow layoutu
+                       powyzej (m.in. wlasny start animacji panelu), przez co element potrafi
+                       "odjechac" od poprawnej pozycji mimo ze scrollY sie nie zmienia.
+                       Doscrollowujemy raz jeszcze, gdy wszystko juz na pewno sie ustabilizuje. */
+                    setTimeout(function () { openFromHash(initialHash, false); }, 1000);
+                }
+                window.addEventListener('hashchange', function () {
+                    var h = window.location.hash;
+                    openFromHash(h, true);
+                    setTimeout(function () { openFromHash(h, false); }, 1000);
+                });
             })();
         </script>
         <script>
