@@ -785,9 +785,19 @@
                 else document.addEventListener('DOMContentLoaded', function () { setTimeout(initReveals, 150); });
             })();
         </script>
+        <script>
+            /* Webflow IX2 nadal ustawia raz, przy starcie strony, inline opacity:0 na
+               "Czytaj wiecej" (efekt hover) - inline style bije nasza regule CSS bez
+               wzgledu na specyficznosc. Czyscimy go, zeby domyslna widocznosc (opacity:1,
+               wazna na dotyku, gdzie hover nigdy sie nie odpali) zalezala wylacznie
+               od naszego CSS, a na urzadzeniach z hover przejal ja @media (hover: hover). */
+            document.querySelectorAll('.blog-item_cta').forEach(function (el) {
+                el.style.opacity = '';
+            });
+        </script>
 
 
-    
+
 <script>
 /* Amico image guard: any failed/empty image -> on-brand gradient SVG so nothing ever looks broken. */
 (function(){

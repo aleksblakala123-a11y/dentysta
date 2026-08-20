@@ -4552,6 +4552,20 @@ figure {
   justify-content: flex-start;
   align-items: center;
   display: flex;
+  opacity: 1;
+}
+
+/* "Czytaj wiecej" pojawiajace sie na hover - tylko tam, gdzie hover realnie
+   istnieje (mysz/trackpad). Na dotyku (telefon, tablet) etykieta jest widoczna
+   od razu, bo nie ma zdarzenia hover, ktore mogloby ja odslonic. */
+@media (hover: hover) and (pointer: fine) {
+  .blog-item_cta {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  a.blog_item:hover .blog-item_cta {
+    opacity: 1;
+  }
 }
 
 .blog-item_icon-wrap {
