@@ -9588,3 +9588,51 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
     font-size: 14px;
   }
 }
+
+/* ===== Menu mobilne - audyt i poprawki =====
+   Menu obsluguje Webflow: po kliknieciu tworzy .w-nav-overlay, dodaje
+   .w--open na przycisku i data-nav-menu-open na panelu. Samo wysuwanie
+   dziala poprawnie, Escape zamyka. Trzy rzeczy wymagaly poprawy.
+
+   1) TLO PRZEWIJALO SIE POD OTWARTYM MENU
+   Webflow nie blokuje przewijania strony. Overlay dostaje inline wysokosc
+   calego dokumentu (~12 800 px), a panel menu to tylko pierwsze ~900 px -
+   wiec przy probie przewiniecia menu ucieka do gory, a spod niego wyjezdza
+   tresc strony. W markupie jest atrybut fs-scrolldisable-element="smart-nav"
+   (Finsweet), ale skryptu Finsweet nie ma na stronie, wiec nic go nie czyta.
+   Blokujemy przewijanie czystym CSS-em przez :has() - bez dokladania JS.
+   Starsze przegladarki bez :has() zachowaja sie jak dotychczas.
+
+   2) PRZYCISK HAMBURGERA MIAL 24x18 px
+   Regula .navbar-toggler-button { padding: 0 } skasowala domyslny padding
+   Webflow (18 px). Najwazniejszy przycisk na telefonie mial cel dotykowy
+   mniejszy niz paznokiec. Powiekszamy sam obszar klikalny pseudo-elementem
+   do 44x44 px - ikona zostaje dokladnie tam, gdzie byla, zero zmian w ukladzie.
+
+   3) LINKI W MENU MIALY 36 px WYSOKOSCI I ZEROWY ODSTEP
+   Cztery pozycje sklejone jedna pod druga, kazda ponizej wygodnego celu
+   dotykowego. 48 px daje pewne trafienie i wyrazny rytm listy. ===== */
+
+html:has(.w-nav-button.w--open),
+html:has(.w-nav-button.w--open) body {
+  overflow: hidden;
+}
+
+@media screen and (max-width: 991px) {
+  .navbar-toggler-button.w-nav-button {
+    position: relative;
+  }
+
+  /* Cel dotykowy 44x44 wokol ikony 24x18, bez wplywu na uklad. */
+  .navbar-toggler-button.w-nav-button::after {
+    content: "";
+    position: absolute;
+    inset: -13px -10px;
+  }
+
+  .navbar_menu .navbar_link {
+    min-height: 48px;
+    justify-content: flex-start;
+    align-items: center;
+  }
+}
