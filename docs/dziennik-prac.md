@@ -62,6 +62,7 @@ Kazdy blok ma komentarz z uzasadnieniem. Kolejnosc od gory:
 | ~9660 | Pasek nawigacji przyklejony | `position:absolute` -> **`fixed`**. `sticky` odpadl pomiarem: wraca do flow i spycha hero o **69 px** (h1 ze 104 na 173 px), a hero ma `padding-top:420px` wlasnie pod nachodzacy pasek. Tlo `primary-700` (#022f34) dopiero po przewinieciu, klasa `.is-scrolled` z IntersectionObservera. Kontrast linkow **13.32:1**, hamburgera i tekstu CTA **14.4:1**. Menu mobilne: overlay przyciety z **12 921 px** do wysokosci ekranu, panel siega dokladnie dolu (szczelina **0 px** na 10 viewportach). |
 | (HTML) | Skip link faktycznie pomija nawigacje | `<main>` dostal `tabindex="-1"` w **7 plikach** (tez privacy/terms/cookies - maja ten sam skip link). Na stronach prawnych to wystarczylo, na nawigacyjnych **nie**: `webflow.js` przechwytuje kotwice i przewija sam, wiec fokus zostawal na skip linku, a kolejny Tab **wracal do nawigacji**. Dolozone jawne `main.focus({preventScroll:true})`. Zmierzone na 7 stronach: fokus `MAIN#main`, nastepny Tab wchodzi w tresc. |
 | (HTML) | Pulapka fokusu w menu mobilnym | Po czterech linkach Tab wychodzil w tresc **pod** nieprzezroczystym panelem (formularz, stopka, karty lekarzy) - fokus na kontrolkach, ktorych nie widac. Rozwiazane przez `inert` na wszystkim poza `.navbar_wrap`, przelaczane MutationObserverem na klasie `.w--open`. Potwierdzone przez CDP: `<main>` ma `ignored=true, powod=inertElement`, wiec czytniki ekranu tez pomijaja tresc. Dolozony Escape na poziomie dokumentu dla przypadku, gdy fokus jest na `<body>`. |
+| ~9770 | Etykiety w formularzu kontaktowym | Pola miaBy tylko `placeholder`. Dodane widoczne `<label>` z `for`/`id` + `autocomplete="name"/"tel"`; placeholdery usuniete jako dublujace. Etykieta i pole owiniete w `.lead-form_field` (wlasny gap 6px), bo `.lead-form` ma `gap:11px` i luzna etykieta wisialaby w rownej odleglosci od dwoch pol. Sprawdzone przez CDP: nazwa dostepna pochodzi z `relatedElement`, nie z placeholdera. Kontrast **17.19:1**. Karta rosnie o ~46 px (467 -> 513 przy 320 px), hero ma na to zapas. |
 
 Zmiany w HTML: adres w stopce (4 pliki) + usuniety zduplikowany krotszy copyright.
 
@@ -116,8 +117,11 @@ w CSS, bo w samym HTML tego nie ma.
 2. **Podstrony bloga nie istnieja.** Wszystkie linki artykulow prowadza do `blog.html` - i to
    nie jest zla sciezka, tylko brak plikow. W repo sa wylacznie 4 strony nawigacyjne.
    Uzgodniony kierunek: najpierw **jeden artykul jako wzorzec**, potem reszta. Nie zrobione.
-3. **Pola formularza nie maja etykiet.** Tylko `placeholder`, zero `<label>` i `aria-label`.
-   Placeholder znika po wpisaniu znaku i bywa pomijany przez czytniki ekranu.
+3. ~~**Pola formularza nie maja etykiet.**~~ **ZROBIONE 2026-08-21.** Widoczne etykiety
+   zamiast placeholderow. Formularz jest **tylko na `index.html`** - podstrony go nie maja.
+   Zostaje jeden brak: przy bledzie walidacji komunikat leci do `.lead-form_status`
+   (`role=status`), ale zadne pole nie dostaje `aria-invalid` i fokus nie wedruje do
+   pierwszego blednego pola (WCAG 3.3.1). Nie ruszane - osobne zadanie.
 4. **CSS wazy ~264 KB** przy budzecie 60 KB. Martwe reguly po Webflow.
 5. **Dane strukturalne (`Dentist`) tylko na `index.html`.** Podstrony ich nie maja.
 6. ~~**Brak pulapki fokusu w menu mobilnym.**~~ **ZROBIONE 2026-08-21.** `inert` na

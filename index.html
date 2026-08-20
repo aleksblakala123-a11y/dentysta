@@ -47,7 +47,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260820n" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260821a" rel="stylesheet" type="text/css"/>
         <style>
 
         </style>
@@ -163,8 +163,14 @@
                                             <div class="lead-form_sub">Poprosimy o kontakt zwrotny w godzinach pracy gabinetu</div>
                                         </div>
                                         <form class="lead-form" id="amico-lead-form" novalidate="">
-                                            <input class="lead-form_input" type="text" name="name" placeholder="Imię i nazwisko" required="">
-                                            <input class="lead-form_input" type="tel" name="phone" placeholder="Numer telefonu" required="">
+                                            <div class="lead-form_field">
+                                                <label class="lead-form_label" for="amico-lead-name">Imię i nazwisko</label>
+                                                <input class="lead-form_input" type="text" id="amico-lead-name" name="name" autocomplete="name" required="">
+                                            </div>
+                                            <div class="lead-form_field">
+                                                <label class="lead-form_label" for="amico-lead-phone">Numer telefonu</label>
+                                                <input class="lead-form_input" type="tel" id="amico-lead-phone" name="phone" autocomplete="tel" required="">
+                                            </div>
                                             <div class="lead-form_hp" aria-hidden="true">
                                                 <label for="amico-lead-website">Zostaw to pole puste</label>
                                                 <input type="text" id="amico-lead-website" name="website" tabindex="-1" autocomplete="off">

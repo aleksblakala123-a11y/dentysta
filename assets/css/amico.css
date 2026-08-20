@@ -9725,3 +9725,41 @@ html {
     overscroll-behavior: contain;
   }
 }
+
+/* ===== Etykiety w formularzu kontaktowym =====
+   BYLO: pola "Imie i nazwisko" oraz "Numer telefonu" mialy wylacznie
+   `placeholder` - zero <label>, zero aria-label. To sa dwa osobne problemy,
+   nie jeden:
+
+   1) Placeholder znika po wpisaniu pierwszego znaku. Uzytkownik, ktory
+      wroci do czesciowo wypelnionego formularza, nie ma jak sprawdzic,
+      co w ktorym polu wpisal - a to formularz, w ktorym zostawia sie
+      numer telefonu do oddzwonienia.
+   2) Placeholder jako jedyne zrodlo nazwy dostepnej jest zawodny: czytniki
+      ekranu traktuja go roznie, a WCAG 3.3.2 (Labels or Instructions)
+      oczekuje etykiety, nie podpowiedzi w polu.
+
+   Widoczna, trwala etykieta naprawia oba naraz. Placeholdery usuniete,
+   bo dublowalyby jej tresc.
+
+   DLACZEGO OWIJAMY W .lead-form_field:
+   .lead-form to flex w kolumnie z `gap: 11px`. Etykieta wrzucona luzem
+   staje sie osobnym elementem flexa i wisi w ROWNEJ odleglosci od swojego
+   pola i od pola nad nim - nie widac, do czego nalezy. Grupa etykieta+pole
+   jest jednym elementem flexa z wlasnym, ciasniejszym odstepem 6px.
+
+   Kolor #011f23 jest juz uzywany na tekst pol i tytul karty - nie
+   dokladamy nowego koloru do palety. ===== */
+
+.lead-form_field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lead-form_label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #011f23;
+}
