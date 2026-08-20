@@ -9372,3 +9372,219 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
     flex-basis: 100%;
   }
 }
+
+/* ===== Slider opinii - poprawki pod telefony i tablety =====
+
+   1) ROWNA WYSOKOSC SLAJDOW
+   .w-slide to inline-block, wiec wszystkie slajdy leza w jednej linii, a
+   wysokosc maski = wysokosc najwyzszego slajdu. Krotsze opinie zostawialy
+   pustke pod karta (zmierzone: 1440 px -> 453/420/453, 480 px -> 491/458/491,
+   360 px -> 571/515/548). Deklaracje height:100% na .testimonial-slider_slide
+   i _card nie dzialaly, bo procent nie ma sie do czego odniesc - maska tez ma
+   height:100%, a jej realna wysokosc bierze sie z tresci.
+   Maska jako flex z align-items:stretch rozciaga wszystkie slajdy do wysokosci
+   najwyzszego. flex:0 0 100% zachowuje dotychczasowa szerokosc slajdu, wiec
+   mechanika przesuwania (transform na slajdach) dziala bez zmian.
+
+   2) CEL DOTYKOWY KROPEK
+   Kropki mialy 12x12 px z 6 px odstepu - ponizej minimum 24x24 px z WCAG 2.5.8
+   i grubo ponizej wygodnego celu dla kciuka. Strzalki sa ukryte, wiec na
+   telefonie kropki to jedyny sposob przelaczania opinii poza swipe'em.
+   Wizualnie kropka zostaje 12 px; powiekszamy wylacznie obszar klikalny
+   (pseudo-element) i odstep, tak zeby sasiednie pola sie nie nakladaly:
+   28 px szerokosci przy 28 px rozstawu srodkow. ===== */
+.testimonial-slider_mask {
+  display: flex;
+  align-items: stretch;
+}
+
+.testimonial-slider_slide {
+  flex: 0 0 100%;
+  height: auto;
+}
+
+/* Slajd ma teraz konkretna wysokosc (rozciagniety przez flexa), wiec
+   procent na karcie wreszcie ma sie do czego odniesc. */
+.testimonial-slider_card {
+  height: 100%;
+}
+
+.testimonial-slider_nav .w-slider-dot {
+  width: 12px;
+  height: 12px;
+  margin: 0 8px 8px;
+  position: relative;
+}
+
+.testimonial-slider_nav .w-slider-dot::after {
+  content: "";
+  position: absolute;
+  inset: -16px -8px;
+}
+
+/* ===== Strzalki slidera opinii - przywrocona widocznosc =====
+   .testimonial-slider_arrow mialo display:none - Webflow caly czas podpina pod
+   nie obsluge klikniec, byly tylko niewidoczne. Bazowa regula Webflow
+   .w-slider-arrow-left/right ustawia inset:0 + margin:auto + width:80px, czyli
+   rozciagnelaby przycisk przez cala wysokosc slidera i polozyla go na tekscie
+   opinii - dlatego pozycjonowanie nadpisujemy jawnie.
+
+   Strzalki laduja w dolnym pasie slidera (miedzy dolem karty a kropkami), po
+   bokach kropek: zero nachodzenia na tresc, dziala na kazdej szerokosci.
+   Pas ma 48 px na desktopie i 44 px na najwezszych ekranach, stad mniejszy
+   rozmiar ponizej 480 px. ===== */
+.testimonial-slider_arrow {
+  display: flex;
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  z-index: 3;
+  cursor: pointer;
+  transition: background-color .25s ease, transform .25s ease;
+}
+
+.testimonial-slider_arrow.w-slider-arrow-left {
+  left: 0;
+  right: auto;
+}
+
+.testimonial-slider_arrow.w-slider-arrow-right {
+  right: 0;
+  left: auto;
+}
+
+.testimonial-slider_arrow:hover {
+  background-color: var(--primitive-color--primary-600, #24a3b1);
+}
+
+.testimonial-slider_arrow:active {
+  transform: scale(.94);
+}
+
+/* Webflow nadaje strzalkom tabindex i role=button, wiec sa osiagalne
+   klawiatura - musza miec widoczny fokus. */
+.testimonial-slider_arrow:focus-visible {
+  outline: 2px solid var(--primitive-color--neutral-0, #fff);
+  outline-offset: 2px;
+}
+
+/* Dolny pas ma 48 px do 768 px wlacznie, a nizej 44 px (zmierzone: 489-441
+   kontra 535-491 i 527-483). Przy 48 px strzalka wchodzila na dol karty o 2 px,
+   wiec ponizej 768 px schodzimy do 44 px - dokladnie na wysokosc pasa, a przy
+   okazji to rekomendowany rozmiar celu dotykowego. */
+@media screen and (max-width: 767px) {
+  .testimonial-slider_arrow {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .testimonial-slider_arrow {
+    transition: none;
+  }
+  .testimonial-slider_arrow:active {
+    transform: none;
+  }
+}
+
+/* ===== Formularz kontaktowy i stopka na malych ekranach =====
+
+   1) POLA FORMULARZA MIALY font-size: 15px
+   Safari na iOS automatycznie przybliza cala strone, gdy uzytkownik tapnie w
+   pole o rozmiarze czcionki mniejszym niz 16 px - nie da sie tego wylaczyc
+   inaczej niz podniesieniem fontu. Po zoomie uzytkownik zostaje z przesunietym
+   widokiem i musi recznie oddalac. 16 px to jedyna wartosc, ktora to wylacza.
+
+   2) TEKST ZGODY I NOTKA MIALY 12 px
+   Zgoda na przetwarzanie danych to tresc, ktora pacjent faktycznie powinien
+   przeczytac. 12 px na telefonie jest za male - 13 px z luzniejsza interlinia.
+
+   3) MAILE W STOPCE WYCHODZILY POZA EKRAN
+   Adres amicodental@amicodental.pl przy 22 px ma 311 px szerokosci minimalnej,
+   a kontener przy 320 px viewportu daje 288 px. Nierozrywalny ciag znakow
+   rozpychal rodzica ponad szerokosc kontenera i konczyl sie 6 px za krawedzia
+   ekranu. Ponizej 360 px schodzimy z fontem, a overflow-wrap zostaje jako
+   zabezpieczenie dla dluzszych adresow.
+
+   4) LINKI KONTAKTOWE W STOPCE MIALY 26 px WYSOKOSCI
+   To najwazniejsze linki na stronie (telefon i mail). Na telefonie daja
+   im pelna wysokosc 44 px, zeby trafienie kciukiem nie bylo loteria. ===== */
+
+/* Sam kwadracik checkboxa mial 16x16 px. Cel dotykowy jest wiekszy - caly
+   <label> przelacza pole, co zweryfikowalem tapnieciem w tekst - ale w sam
+   kwadracik trafia sie trudno. 22 px to kompromis miedzy wygoda a proporcja
+   do 13-pikselowego tekstu obok. */
+.lead-form_consent input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  accent-color: var(--primitive-color--primary-600, #24a3b1);
+}
+
+/* UWAGA na min-width:0 i overflow-wrap w tym miejscu. Pierwsza wersja tej
+   poprawki ustawiala je globalnie - i owszem, naprawiala 320 px, ale w zakresie
+   480-660 px kolumna gridu mogla wtedy zejsc ponizej min-content i adres mailowy
+   lamal sie w polowie ("amicodental@amico / dental.pl"). Zamiast pozwalac na
+   lamanie, zmniejszamy font tam, gdzie adres faktycznie sie nie miesci -
+   czyli tylko ponizej 360 px. Reszta zakresu zostaje bez zmian. */
+.footer-contact_wrap a {
+  max-width: 100%;
+}
+
+@media screen and (max-width: 767px) {
+  .lead-form_input {
+    font-size: 16px;
+  }
+
+  .lead-form_consent span,
+  .lead-form_consent a,
+  .lead-form_note {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .footer-contact_wrap a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 359px) {
+  .footer-contact_wrap {
+    min-width: 0;
+  }
+
+  .footer-contact_wrap a,
+  .footer-contact_wrap a div {
+    font-size: 17px;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ===== Adres gabinetu w stopce =====
+   Stopka miala tylko telefon i mail - brakowalo trzeciego elementu NAP
+   (nazwa / adres / telefon), ktory Google czyta przy lokalnym pozycjonowaniu.
+   Znacznik <address> to semantycznie wlasciwy element dla danych kontaktowych
+   wlasciciela strony; przegladarki daja mu domyslnie kursywe, stad reset.
+   Wyglad dopasowany do sasiednich linkow, ale mniejszy - adres jest dluzszy
+   niz numer telefonu i przy 22 px rozpychalby kolumne. ===== */
+.footer-contact_address {
+  margin: 4px 0 0;
+  font-style: normal;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-shadow--white-70, #cdd8da);
+  text-align: right;
+  max-width: 100%;
+}
+
+@media screen and (max-width: 767px) {
+  .footer-contact_address {
+    font-size: 14px;
+  }
+}
