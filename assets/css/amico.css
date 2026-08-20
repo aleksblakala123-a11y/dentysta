@@ -9167,3 +9167,95 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 .skip-link:focus {
   top: 16px;
 }
+
+/* ===== Sekcja "Znajdziesz nas w Swidniku" - karta lokalizacji =====
+   Problem: .locatioin_item mial sztywne, pionowe wymiary (570x600, potem
+   520/430x600/470, 280x340) - pozostalosc po webflowowym poziomym sliderze
+   wielu lokalizacji (stad tez margin-right miedzy kartami). Lokalizacja jest
+   jedna, wiec karta wisiala przy lewej krawedzi, a poziome zdjecie 1344x752
+   wciskane object-fit:cover w kadr niemal kwadratowy tracilo ~47% szerokosci
+   - postac przy prawej krawedzi byla przecieta w polowie.
+
+   Rozwiazanie: karta na pelna szerokosc kontenera, kadr sterowany
+   aspect-ratio zamiast sztywnej wysokosci. Przy 16/9 proporcje kadru
+   (1.78) niemal pokrywaja sie z proporcjami pliku (1.787), wiec cover
+   przycina juz tylko kilka pikseli. Nizej kadr stopniowo sie podnosi,
+   zeby na waskich ekranach zdjecie nie zrobilo sie paskiem. ===== */
+.locatioin_item {
+  width: 100%;
+  max-width: var(--_max-width---container--1160px, 1160px);
+  height: auto;
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.location_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 42% zamiast 50% - twarze siedza w gornej polowie kadru, wiec przy
+     mocniejszym przycieciu obcinamy podloge, a nie glowy. */
+  object-position: 50% 42%;
+}
+
+/* Gradient miał 50% wysokosci i zaczynal sie zbyt nisko - bialy tekst
+   ladowal na jasnym fartuchu. Wyzszy i mocniej domkniety u dolu. */
+.location_overlay {
+  height: 70%;
+  background-image: linear-gradient(180deg,
+      #000b0b00 0%,
+      #000b0b59 38%,
+      #000b0bd9 100%);
+}
+
+.location_content {
+  max-width: min(440px, 100%);
+}
+
+@media screen and (max-width: 991px) {
+  .locatioin_item {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .locatioin_item {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .locatioin_item {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    min-height: 360px;
+  }
+  .location_content {
+    max-width: 100%;
+  }
+}
+
+/* Sekcja lokalizacji miala padding-bottom: 0 (klasa bottom-none), przez co
+   nastepna sekcja (.section_cta) wchodzila na dolna krawedz karty o 20 px -
+   zdjecie dosłownie znikalo pod tlem kolejnej sekcji. Nadpisujemy padding
+   tylko w tej jednej sekcji, zeby nie ruszac wspoldzielonej klasy bottom-none
+   (uzywa jej tez hero). */
+.section_location .section-padding.bottom-none {
+  padding-bottom: 120px;
+}
+@media screen and (max-width: 991px) {
+  .section_location .section-padding.bottom-none {
+    padding-bottom: 80px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .section_location .section-padding.bottom-none {
+    padding-bottom: 64px;
+  }
+}
