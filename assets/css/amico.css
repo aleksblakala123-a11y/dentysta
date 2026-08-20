@@ -9259,3 +9259,116 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
     padding-bottom: 64px;
   }
 }
+
+/* ===== Sekcja "Poznaj lekarzy Amico Dental" (about.html) - czytelnosc naglowka =====
+   Sekcja .section_team ma jako tlo zdjecie gabinetu (regula z !important wyzej),
+   a nie jednolity kolor. Zmierzone z pikseli pod akapitem po prawej: luminancja
+   tla waha sie od 0.015 do 0.822 w obrebie JEDNEGO bloku tekstu (rosliny, okno,
+   jasny sufit). Przy szarym #646464 najgorszy kontrast w kadrze wynosil 2.72:1
+   - ponizej progu WCAG AA (4.5:1).
+
+   Sam dobor ciemniejszego koloru tego nie naprawia: cokolwiek ciemnego zginie
+   na ciemnej zieleni, cokolwiek jasnego zginie na jasnym suficie. Dlatego blok
+   naglowka dostaje wlasna, jasna podkladke - dopiero na niej kolor tekstu ma
+   stabilne, przewidywalne tlo. Podkladka jest polprzezroczysta, wiec zdjecie
+   dalej przebija.
+
+   Zakres: #zespol wystepuje wylacznie na about.html, wiec sekcja zespolu na
+   stronie glownej (.section_team.is-home, bialy tekst na ciemnym kadrze)
+   zostaje nietknieta. ===== */
+#zespol .team_header.is-about {
+  background-color: rgba(247, 251, 251, .95);
+  border-radius: var(--_size-variables---border-radius--2xl, 20px);
+  padding: 32px;
+}
+
+#zespol .about-team_para {
+  color: #3a4a4d;
+}
+
+/* .section_tag ma na sztywno color:#fff - projektowany pod ciemne sekcje.
+   Tutaj bialy tekst lezal na jasnym suficie: kontrast 1.13:1, czyli plakietka
+   "Nasz zespol" byla praktycznie niewidoczna. */
+/* Regula .section_team .section_tag (bialy tekst + biale tlo 16%) jest
+   oznaczona !important, wiec nadpisanie tez go wymaga - inaczej przegrywa
+   mimo wyzszej specyficznosci. */
+#zespol .section_tag {
+  color: var(--primitive-color--primary-900, #011f23) !important;
+  background: rgba(1, 31, 35, .06) !important;
+  border-color: rgba(1, 31, 35, .14);
+}
+
+#zespol .section_tag svg,
+#zespol .section_tag path {
+  color: var(--primitive-color--primary-900, #011f23) !important;
+  fill: var(--primitive-color--primary-900, #011f23) !important;
+}
+
+/* Specjalizacje na kartach lekarzy: #707070 na bialym to 4.95:1 - AA przechodzi,
+   AAA nie. Przy 16 px tekscie pomocniczym warto miec zapas. */
+#zespol .team-menuber_designation {
+  color: #3a4a4d;
+}
+
+@media screen and (max-width: 767px) {
+  #zespol .team_header.is-about {
+    padding: 24px;
+  }
+}
+
+/* ===== Sekcje zespolu - ostatni, niepelny rzad kart =====
+   .team_list to grid: 3 kolumny na desktopie, 2 ponizej 992 px, 1 ponizej 480 px.
+   Gdy liczba lekarzy nie dzieli sie przez liczbe kolumn, ostatni rzad dosuwa sie
+   do lewej i zostawia pusta komorke w prawym dolnym rogu:
+
+     about.html  (5 lekarzy)  1440 px -> dziura 373x500
+                              991/767 px -> dziura 466x500 / 360x400
+     index.html  (3 lekarzy)  991/767 px -> dziura 466x500 / 360x400
+
+   Zamiana grida na flex z zawijaniem pozwala wysrodkowac niepelny rzad.
+   Szerokosci licze tak, zeby odwzorowac dotychczasowa siatke co do piksela
+   ((100% - odstepy) / liczba kolumn), wiec pelne rzedy wygladaja identycznie
+   jak wczesniej - zmienia sie wylacznie rzad niepelny.
+
+   Obie sekcje (.section_team na about.html i .section_team.is-home na index.html)
+   maja identyczne szerokosci kolumn i odstepy, wiec obsluguje je jedna regula.
+   Dzieci .team_list nie maja przypisanych grid-area ani id w-node, wiec zmiana
+   kontenera niczego nie rozjezdza. ===== */
+.section_team .team_list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px 20px;
+}
+
+.section_team .team_list > * {
+  flex: 0 1 calc((100% - 40px) / 3);
+  min-width: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .section_team .team_list {
+    gap: 28px 20px;
+  }
+  .section_team .team_list > * {
+    flex-basis: calc((100% - 20px) / 2);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .section_team .team_list {
+    gap: 24px 16px;
+  }
+  .section_team .team_list > * {
+    flex-basis: calc((100% - 16px) / 2);
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .section_team .team_list {
+    gap: 20px 16px;
+  }
+  .section_team .team_list > * {
+    flex-basis: 100%;
+  }
+}
