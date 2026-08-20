@@ -47,7 +47,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260821a" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260821b" rel="stylesheet" type="text/css"/>
         <style>
 
         </style>
@@ -180,7 +180,7 @@
                                                 <span>Wyrażam zgodę na kontakt telefoniczny w sprawie umówienia wizyty i przetwarzanie moich danych zgodnie z <a href="privacy.html" target="_blank" rel="noopener">polityką prywatności</a>.</span>
                                             </label>
                                             <button class="lead-form_btn" type="submit">Poproś o kontakt</button>
-                                            <div class="lead-form_status" role="status" aria-live="polite"></div>
+                                            <div class="lead-form_status" id="amico-lead-status" role="status" aria-live="polite"></div>
                                             <div class="lead-form_note">Bez spamu. Oddzwoni do Ciebie prawdziwa osoba z recepcji.</div>
                                         </form>
                                         <div class="lead-form_success" style="display:none" role="status" aria-live="polite">
@@ -1658,11 +1658,36 @@
                 var btnDefaultText = btn ? btn.textContent : '';
                 var statusEl = form.querySelector('.lead-form_status');
                 var honeypot = form.querySelector('input[name="website"]');
+                var nameInput = form.querySelector('input[name="name"]');
+                var phoneInput = form.querySelector('input[name="phone"]');
+                var consentInput = form.querySelector('input[name="consent"]');
+                var STATUS_ID = statusEl && statusEl.id ? statusEl.id : '';
 
                 function setStatusText(message, type) {
                     if (!statusEl) return;
                     statusEl.textContent = message || '';
                     statusEl.className = 'lead-form_status' + (type ? ' is-' + type : '');
+                }
+
+                /* Identyfikacja bledu (WCAG 3.3.1). Sam komunikat w role="status"
+                   mowi, CO jest nie tak, ale nie wskazuje KTOREGO pola dotyczy
+                   i zostawia uzytkownika tam, gdzie byl. Oznaczamy pole przez
+                   aria-invalid, wiazemy je z komunikatem przez aria-describedby
+                   i przenosimy na nie fokus. */
+                function clearInvalid() {
+                    [nameInput, phoneInput, consentInput].forEach(function (el) {
+                        if (!el) return;
+                        el.removeAttribute('aria-invalid');
+                        el.removeAttribute('aria-describedby');
+                    });
+                }
+
+                function markInvalid(el, message) {
+                    setStatusText(message, 'error');
+                    if (!el) return;
+                    el.setAttribute('aria-invalid', 'true');
+                    if (STATUS_ID) el.setAttribute('aria-describedby', STATUS_ID);
+                    el.focus();
                 }
 
                 function setStatusError() {
@@ -1699,12 +1724,26 @@
                     var phone = (form.querySelector('input[name="phone"]').value || '').trim();
                     var consent = form.querySelector('input[name="consent"]');
 
-                    if (!name || !phone) {
-                        setStatusText('Uzupełnij imię i numer telefonu.', 'error');
+                    clearInvalid();
+
+                    /* Komunikat nazywa dokladnie to pole, na ktore leci fokus.
+                       Wczesniej przy samym brakujacym telefonie mowil "uzupelnij
+                       imie i numer" - a przez aria-describedby to wlasnie ten
+                       tekst czytnik podaje jako opis pola telefonu. */
+                    if (!name && !phone) {
+                        markInvalid(nameInput, 'Uzupełnij imię i numer telefonu.');
+                        return;
+                    }
+                    if (!name) {
+                        markInvalid(nameInput, 'Uzupełnij imię i nazwisko.');
+                        return;
+                    }
+                    if (!phone) {
+                        markInvalid(phoneInput, 'Uzupełnij numer telefonu.');
                         return;
                     }
                     if (!consent || !consent.checked) {
-                        setStatusText('Zaznacz zgodę na kontakt, aby wysłać zgłoszenie.', 'error');
+                        markInvalid(consentInput, 'Zaznacz zgodę na kontakt, aby wysłać zgłoszenie.');
                         return;
                     }
 
@@ -1734,6 +1773,23 @@
                         setStatusError();
                     });
                 });
+
+                /* Znak bledu znika, gdy uzytkownik zacznie poprawiac pole -
+                   inaczej czerwona ramka i aria-invalid zostalyby na polu,
+                   ktore juz jest poprawne. */
+                [nameInput, phoneInput].forEach(function (el) {
+                    if (!el) return;
+                    el.addEventListener('input', function () {
+                        el.removeAttribute('aria-invalid');
+                        el.removeAttribute('aria-describedby');
+                    });
+                });
+                if (consentInput) {
+                    consentInput.addEventListener('change', function () {
+                        consentInput.removeAttribute('aria-invalid');
+                        consentInput.removeAttribute('aria-describedby');
+                    });
+                }
             })();
         </script>
 
