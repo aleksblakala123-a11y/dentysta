@@ -64,6 +64,7 @@ Kazdy blok ma komentarz z uzasadnieniem. Kolejnosc od gory:
 | (HTML) | Pulapka fokusu w menu mobilnym | Po czterech linkach Tab wychodzil w tresc **pod** nieprzezroczystym panelem (formularz, stopka, karty lekarzy) - fokus na kontrolkach, ktorych nie widac. Rozwiazane przez `inert` na wszystkim poza `.navbar_wrap`, przelaczane MutationObserverem na klasie `.w--open`. Potwierdzone przez CDP: `<main>` ma `ignored=true, powod=inertElement`, wiec czytniki ekranu tez pomijaja tresc. Dolozony Escape na poziomie dokumentu dla przypadku, gdy fokus jest na `<body>`. |
 | ~9770 | Etykiety w formularzu kontaktowym | Pola miaBy tylko `placeholder`. Dodane widoczne `<label>` z `for`/`id` + `autocomplete="name"/"tel"`; placeholdery usuniete jako dublujace. Etykieta i pole owiniete w `.lead-form_field` (wlasny gap 6px), bo `.lead-form` ma `gap:11px` i luzna etykieta wisialaby w rownej odleglosci od dwoch pol. Sprawdzone przez CDP: nazwa dostepna pochodzi z `relatedElement`, nie z placeholdera. Kontrast **17.19:1**. Karta rosnie o ~46 px (467 -> 513 przy 320 px), hero ma na to zapas. |
 | ~9808 | Identyfikacja bledu w formularzu | `aria-invalid` na blednym polu + `aria-describedby` wiazace je z komunikatem + przeniesienie fokusu (WCAG 3.3.1). Znacznik znika przy pierwszym znaku w polu. Czerwona ramka `#c0392b` w tym samym kolorze co komunikat, kontrast **5.44:1** (WCAG 1.4.11 wymaga 3:1 dla elementow nietekstowych). Osobna regula na `:focus`, bo `.lead-form_input:focus` przestawia ramke na primary-500 - pole gubiloby czerwien dokladnie w chwili, gdy leci na nie fokus. |
+| (HTML) | Dane strukturalne `Dentist` na podstronach | Blok dodany na `about.html` i `blog.html` - skopiowany bajt w bajt z `index.html`, zero nowych danych o firmie. Wszystkie cztery bloki dostaly wspolne `"@id": "https://amicodental.pl/#dentist"`, zeby wyszukiwarki widzialy **jeden podmiot**, a nie cztery gabinety pod tym samym adresem. `url` ujednolicony do strony glownej (wczesniej `service.html` podawal sam siebie jako adres firmy). |
 
 Zmiany w HTML: adres w stopce (4 pliki) + usuniety zduplikowany krotszy copyright.
 
@@ -129,7 +130,15 @@ w CSS, bo w samym HTML tego nie ma.
    staloby sie **opisem pola telefonu** czytanym przez czytnik ekranu. Teraz sa trzy
    warianty, dobierane do tego, czego faktycznie brakuje.
 4. **CSS wazy ~264 KB** przy budzecie 60 KB. Martwe reguly po Webflow.
-5. **Dane strukturalne (`Dentist`) tylko na `index.html`.** Podstrony ich nie maja.
+5. ~~**Dane strukturalne (`Dentist`) tylko na `index.html`.**~~ **ZROBIONE 2026-08-21.**
+   Sprostowanie: ten wpis byl niescisly - `service.html` mial `Dentist` (plus `FAQPage`)
+   juz wczesniej. Brakowalo na `about.html` i `blog.html`; obie strony maja go teraz,
+   a cala czworka jest spieta wspolnym `@id`.
+
+   **Znalezione przy okazji, nietkniete:** numer GSM `+48512570035` jest w schemacie na
+   wszystkich stronach, ale w widocznej tresci **tylko na `index.html`** - stopki podstron
+   pokazuja sam numer glowny. Numer jest prawdziwy i uzywany w serwisie, wiec zostal
+   w danych, ale ujednolicenie stopek zamknelo by temat spojnosci NAP.
 6. ~~**Brak pulapki fokusu w menu mobilnym.**~~ **ZROBIONE 2026-08-21.** `inert` na
    wszystkim poza paskiem. Przy okazji sprostowanie do sekcji 4: Escape **nie** zamykal
    menu "zawsze" - Webflow wiesza obsluge na nawigacji, wiec dzialal tylko dopoki fokus
