@@ -59,6 +59,8 @@ Kazdy blok ma komentarz z uzasadnieniem. Kolejnosc od gory:
 | ~9494 | Formularz i stopka na malych ekranach | pola mialy `font-size:15px` -> **Safari na iOS przybliza strone** przy tapnieciu w pole ponizej 16 px; tekst zgody 12 px -> 13 px; mail w stopce wychodzil **6 px za krawedz** przy 320 px; linki kontaktowe 26 px -> 44 px wysokosci; checkbox 16 px -> 22 px. |
 | ~9569 | Adres w stopce | dodany `<address>` - trzeci element NAP (nazwa/adres/telefon) dla lokalnego SEO. |
 | ~9592 | Menu mobilne | blokada przewijania tla przez `:has()` (Webflow nie blokuje; atrybut `fs-scrolldisable-element="smart-nav"` jest w markupie, ale **skryptu Finsweet nie ma na stronie**); cel dotykowy hamburgera **24x18 -> 44x44 px**; linki menu 36 -> 48 px. |
+| ~9660 | Pasek nawigacji przyklejony | `position:absolute` -> **`fixed`**. `sticky` odpadl pomiarem: wraca do flow i spycha hero o **69 px** (h1 ze 104 na 173 px), a hero ma `padding-top:420px` wlasnie pod nachodzacy pasek. Tlo `primary-700` (#022f34) dopiero po przewinieciu, klasa `.is-scrolled` z IntersectionObservera. Kontrast linkow **13.32:1**, hamburgera i tekstu CTA **14.4:1**. Menu mobilne: overlay przyciety z **12 921 px** do wysokosci ekranu, panel siega dokladnie dolu (szczelina **0 px** na 10 viewportach). |
+| (HTML) | Skip link faktycznie pomija nawigacje | `<main>` dostal `tabindex="-1"` w **7 plikach** (tez privacy/terms/cookies - maja ten sam skip link). Na stronach prawnych to wystarczylo, na nawigacyjnych **nie**: `webflow.js` przechwytuje kotwice i przewija sam, wiec fokus zostawal na skip linku, a kolejny Tab **wracal do nawigacji**. Dolozone jawne `main.focus({preventScroll:true})`. Zmierzone na 7 stronach: fokus `MAIN#main`, nastepny Tab wchodzi w tresc. |
 
 Zmiany w HTML: adres w stopce (4 pliki) + usuniety zduplikowany krotszy copyright.
 
@@ -81,6 +83,17 @@ w CSS, bo w samym HTML tego nie ma.
   Panel `absolute` przykryje `.navbar-button_wrapper` (`static`) i zablokuje klikniecia.
 - **Inline style po IX2:** Webflow raz, przy starcie, ustawia inline `opacity:0`, `height:0`,
   `transform`. Inline bije kazda regule CSS - trzeba je wyczyscic z JS na starcie.
+- **`webflow.js` przechwytuje linki-kotwice** (`href="#cos"`): robi `preventDefault`
+  i przewija wlasnym kodem. Skutek uboczny: przegladarka **nie przenosi fokusu** do celu,
+  wiec sam `tabindex="-1"` na celu nie naprawia skip linku. Trzeba wolac `.focus()` recznie.
+  Widac to tylko na stronach z webflow.js - na statycznych stronach prawnych dziala natywnie.
+- **`top:100%` liczy sie od PADDING BOXA rodzica, nie border boxa.** Pasek ma
+  `border-bottom:1px`, wiec overlay menu (`top:100%`) startowal 1 px wyzej, niz wynika
+  z `height`. Stad druga zmienna `--navbar-inner-h` (`nav.clientHeight`) - bez niej panel
+  konczyl sie 1 px nad dolna krawedzia ekranu.
+- **Webflow ustawia `.w-nav-overlay` inline `height` rowne wysokosci CALEGO dokumentu**
+  (~12 900 px). Przy pasku `absolute` bylo to niegrozne; przy `fixed` overlay jest
+  zakotwiczony w viewporcie i rozciaga sie daleko pod ekran. Inline bije regule - `!important`.
 - **`.w-slider-arrow-left/right`** ma bazowo `inset:0; margin:auto; width:80px` - samo
   odkrycie `display` rozciaga przycisk przez cala wysokosc slidera na tekscie.
 
@@ -88,11 +101,11 @@ w CSS, bo w samym HTML tego nie ma.
 
 ## 5. Otwarte watki
 
-1. **Pasek nawigacji nie jest sticky.** `position: absolute`, `z-index: 1000`. Po przewinieciu
-   800 px jest **calkowicie poza ekranem**, na kazdej szerokosci. Na `service.html` (11 500 px
-   wysokosci) pacjent w polowie strony nie ma jak nawigowac. Uzgodniona decyzja: **sticky
-   z tlem pojawiajacym sie po przewinieciu** (IntersectionObserver dokladajacy klase, ~15 linii,
-   bez bibliotek). **Nie zaimplementowane.**
+1. ~~**Pasek nawigacji nie jest sticky.**~~ **ZROBIONE 2026-08-20.** Wdrozone jako
+   `position:fixed` (nie `sticky` - patrz tabela), z tlem po przewinieciu. Przy okazji
+   wyszlo, ze pasek ma `height:auto`, wiec przy **768-991 px mierzy 67 px, a nie 69**;
+   wysokosc jest teraz mierzona w JS i publikowana jako `--navbar-h` / `--navbar-inner-h`,
+   zamiast stalych zgadywanych per breakpoint.
 2. **Podstrony bloga nie istnieja.** Wszystkie linki artykulow prowadza do `blog.html` - i to
    nie jest zla sciezka, tylko brak plikow. W repo sa wylacznie 4 strony nawigacyjne.
    Uzgodniony kierunek: najpierw **jeden artykul jako wzorzec**, potem reszta. Nie zrobione.
@@ -111,6 +124,12 @@ Chromium + Playwright, viewporty **320 / 360 / 412 / 480 / 767 / 991 / 1200 / 14
 Mierz, nie ogladaj: `getBoundingClientRect`, `getComputedStyle`, `elementFromPoint`
 (czy element jest **naprawde** klikalny, a nie przykryty), `document.documentElement.scrollWidth`
 kontra `clientWidth` (poziomy scroll), kontrast liczony z **pikseli zrzutu** gdy tlem jest zdjecie.
+
+**IntersectionObserver nie zadziala w karcie, ktora nie kompozytuje klatek.** Panel
+przegladarki schowany => `document.visibilityState==="hidden"`, `requestAnimationFrame`
+nie strzela ani razu, IO nigdy nie wola callbacka - i `.is-scrolled` "nie dziala", mimo ze
+kod jest poprawny. Zanim uznasz to za blad strony, sprawdz `visibilityState` i licznik rAF.
+Pomiary rob w Playwrighcie (renderuje naprawde), nie w schowanym panelu.
 
 Uwaga na artefakty testowe: `locator.click()` w Playwright sam przewija element do widoku -
 przy pasku nawigacji na `position:absolute` zeruje to `scrollY` i wyglada jak blad strony.

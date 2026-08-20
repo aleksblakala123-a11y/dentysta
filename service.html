@@ -165,7 +165,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260820k" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260820n" rel="stylesheet" type="text/css"/>
         <style>
 
         </style>
@@ -240,7 +240,7 @@
                     </div>
                 </div>
             </div>
-            <main class="main-wrapper" id="main">
+            <main class="main-wrapper" id="main" tabindex="-1">
                 <header class="section_hero">
                     <div class="section-padding padding-hero">
                         <div class="container">
@@ -1545,6 +1545,67 @@
     if(im.complete && im.naturalWidth===0 && !im.dataset.fbk){ im.dataset.fbk='1'; im.src=ph(im.alt); }
   }
   document.querySelectorAll('img').forEach(bind);
+})();
+</script>
+<script>
+/* Pasek nawigacji: tlo pojawia sie dopiero po przewinieciu.
+   Sentinel o wysokosci 40 px, pozycjonowany absolutnie na samej gorze
+   dokumentu. Gdy przestaje byc widoczny, pasek dostaje klase .is-scrolled.
+   IntersectionObserver zamiast nasluchu 'scroll' - zero pracy w watku
+   glownym przy kazdej klatce przewijania. Sentinel jest position:absolute,
+   wiec nie zajmuje miejsca w ukladzie i niczego nie przesuwa. */
+(function () {
+  var nav = document.querySelector('.navbar_wrap');
+  if (!nav) return;
+  var root = document.documentElement;
+
+  /* Realna wysokosc paska trafia do CSS jako zmienna. Wartosci wpisane na
+     sztywno w arkuszu sa tylko awaryjne (dzialaja bez JS): pasek ma
+     height:auto, wiec przy 768-991 px mierzy faktycznie 67 px, a nie
+     zakladane 69. --navbar-inner-h to wysokosc pudelka wewnetrznego, bez
+     1 px dolnej ramki - wzgledem niego pozycjonuje sie panel menu, bo
+     top:100% liczy sie od padding boxa. Bez tego panel konczyl sie
+     1 px nad dolna krawedzia ekranu. */
+  function measure() {
+    root.style.setProperty('--navbar-h', nav.getBoundingClientRect().height + 'px');
+    root.style.setProperty('--navbar-inner-h', nav.clientHeight + 'px');
+  }
+  measure();
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(measure).observe(nav);
+  } else {
+    window.addEventListener('resize', measure);
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    nav.classList.add('is-scrolled');
+    return;
+  }
+
+  var sentinel = document.createElement('div');
+  sentinel.setAttribute('aria-hidden', 'true');
+  sentinel.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:40px;pointer-events:none';
+  document.body.appendChild(sentinel);
+
+  new IntersectionObserver(function (entries) {
+    nav.classList.toggle('is-scrolled', !entries[0].isIntersecting);
+  }).observe(sentinel);
+})();
+
+/* Skip link: jawne przeniesienie fokusu.
+   Sam tabindex="-1" na <main> wystarcza na stronach prawnych, ale NIE tutaj:
+   webflow.js przechwytuje linki-kotwice (preventDefault + wlasne plynne
+   przewijanie) i nie wykonuje natywnego przeniesienia fokusu do celu.
+   Zmierzone: po Enterze fokus zostawal na samym skip linku, a kolejny Tab
+   wracal do nawigacji - czyli skip link nie pomijal niczego.
+   preventScroll:true, zeby nie walczyc z przewijaniem Webflow. */
+(function () {
+  var skip = document.querySelector('.skip-link');
+  var main = document.getElementById('main');
+  if (!skip || !main) return;
+  skip.addEventListener('click', function () {
+    main.focus({ preventScroll: true });
+  });
 })();
 </script>
 </body>

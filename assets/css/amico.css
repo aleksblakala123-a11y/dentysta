@@ -9636,3 +9636,92 @@ html:has(.w-nav-button.w--open) body {
     align-items: center;
   }
 }
+
+/* ===== Pasek nawigacji: przyklejony, tlo dopiero po przewinieciu =====
+   BYLO: .navbar_wrap mial position:absolute, wiec przewijal sie razem ze
+   strona. Przy scrollu 800 px jego dolna krawedz byla na -731 px, czyli
+   caly pasek znajdowal sie poza ekranem. Na service.html (11 500 px
+   wysokosci) pacjent w polowie strony nie mial jak nawigowac ani zadzwonic.
+
+   DLACZEGO fixed, A NIE sticky:
+   sticky wraca do normalnego flow i spycha hero o dokladnie 69 px w dol
+   (zmierzone: h1 z 104 px na 173 px). Hero jest projektowany pod nachodzacy,
+   przezroczysty pasek - ma padding-top 420px wlasnie po to. fixed zostaje
+   poza flow, wiec uklad hero nie zmienia sie ani o piksel.
+   Sprawdzone pomiarem: .page-wrapper ma overflow:clip, ale clip NIE tworzy
+   bloku zawierajacego dla position:fixed - pasek nie jest przycinany.
+
+   DLACZEGO CIEMNE TLO, A NIE BIALE:
+   linki maja kolor #f3f6ff, a logo to wariant amico-logo-dark.svg (bialy
+   tekst + cyjanowy znak). Biale tlo wymagaloby podmiany logotypu ORAZ
+   przekolorowania linkow na czterech stronach. Na primary-700 (#022f34)
+   kontrast linkow wynosi 13,32:1 - zero podmian, duzy zapas nad 4,5:1.
+   Border-bottom w stanie przewinietym schodzi z bialego 50% na 12%:
+   na ciemnym tle jasna kreska bila po oczach. ===== */
+
+:root {
+  --navbar-h: 69px;
+  --navbar-inner-h: 68px;
+}
+
+@media screen and (max-width: 767px) {
+  :root { --navbar-h: 60px; --navbar-inner-h: 59px; }
+}
+
+@media screen and (max-width: 479px) {
+  :root { --navbar-h: 50px; --navbar-inner-h: 49px; }
+}
+
+/* Kotwice (skip link "Przejdz do tresci" -> #main) nie moga ladowac pod
+   paskiem. 8 px zapasu, zeby cel nie przylegal do krawedzi. */
+html {
+  scroll-padding-top: calc(var(--navbar-h) + 8px);
+}
+
+.navbar_wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: background-color .3s ease, border-bottom-color .3s ease;
+}
+
+.navbar_wrap.is-scrolled {
+  background-color: var(--primitive-color--primary-700);
+  border-bottom-color: #ffffff1f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar_wrap { transition: none; }
+}
+
+/* ===== Menu mobilne po przejsciu paska na fixed =====
+   Dwie rzeczy, ktore przy position:absolute nie bolaly, a przy fixed juz tak.
+
+   1) OVERLAY Z WYSOKOSCIA CALEGO DOKUMENTU
+   Webflow ustawia .w-nav-overlay inline height rowne wysokosci dokumentu
+   (~12 800 px). Gdy pasek przewijal sie ze strona, nikomu to nie
+   przeszkadzalo. Przy fixed overlay jest zakotwiczony w viewporcie, wiec
+   taka wysokosc rozciaga go daleko pod ekran. Inline style bije zwykla
+   regule - stad !important.
+
+   2) PANEL WYCHODZIL POZA EKRAN
+   .navbar_menu mial min-height:98svh. Pod paskiem 50-60 px jego dolna
+   krawedz ladowala ponizej dolu ekranu, a html ma wtedy overflow:hidden
+   (blokada przewijania tla), wiec ostatniego linku nie dalo sie
+   doscrollowac. Wysokosc rowna realnie dostepnej przestrzeni plus
+   overflow-y:auto sprawia, ze panel przewija sie sam.
+   overscroll-behavior:contain zatrzymuje lancuch przewijania na panelu. ===== */
+
+@media screen and (max-width: 991px) {
+  .navbar_wrap .w-nav-overlay {
+    height: calc(100svh - var(--navbar-inner-h)) !important;
+  }
+
+  .navbar_menu {
+    min-height: calc(100svh - var(--navbar-inner-h));
+    max-height: calc(100svh - var(--navbar-inner-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
