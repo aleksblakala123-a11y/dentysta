@@ -28,6 +28,7 @@ const QUALITY = 82;
 // Pliki do przetworzenia - obrazy faktycznie uzywane w index/about/service/blog.html
 // (w <img src> oraz jako tlo w assets/css/amico.css). Aktualizuj przy dodawaniu nowych zdjec.
 const FILES = [
+  '69ddd539a343355970d2be89_testimonial-background.webp',  // tlo sekcji opinii - zostalo z Webflow bez wariantow, 139 KB na kazdym urzadzeniu
   '69e041cad257c10b1176cd81_success-item-image-1.webp',
   '69e041cb0a159b45d163a9ea_success-item-image-2.webp',
   'gen_about-hero-image.jpg',

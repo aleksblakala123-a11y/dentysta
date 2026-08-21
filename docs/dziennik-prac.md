@@ -694,7 +694,8 @@ Google i **data odczytu**. Zero zewnetrznych skryptow, zero widzetow.
     Elfsight    platform.js   44 086 B  (~43 KB)
 
 I to jest samo wejscie - potem dociagaja dane opinii, awatary i wlasne fonty.
-Strona glowna ma 184 KB JS i 3 s do DOMContentLoaded, wiec widzet to wzrost
+Strona glowna ma 184 KB JS po gzipie (patrz sprostowanie w sekcji 12 - liczba
+3 s do DOMContentLoaded, ktora tu wczesniej stala, byla bledna), wiec widzet to wzrost
 JavaScriptu o 25-50% na stronie, ktora juz jest za wolna. Do tego zewnetrzne
 cookies do obslugi w zgodach.
 
@@ -870,3 +871,94 @@ budynkiem". Gabinet mieści sie w lokalu **9/20/21**, czyli w budynku z numeracj
 mieszkan - trafienie tam bez wskazowek jest realna bariera.
 **Wymaga od gabinetu:** opisu wejscia, pietra i mozliwosci parkowania.
 Tego nie da sie napisac z wyobrazni.
+---
+
+## 12. Wydajnosc: sprostowanie wlasnego bledu i realna optymalizacja (2026-08-21)
+
+### SPROSTOWANIE: strona glowna nigdy nie ladowala sie 3 sekundy
+
+Przez kilka sekcji tego dziennika i w kilku raportach powtarzalem, ze strona
+glowna ma **3009 ms do DOMContentLoaded**, wobec 284 ms na wpisie bloga - i na tej
+podstawie planowalem caly dzien pracy nad odchudzaniem JavaScriptu.
+
+**Ta liczba byla bledna.** Pochodzila z JEDNEGO pomiaru, bez powtorzenia, najpewniej
+wykonanego zaraz po deployu, gdy CDN GitHub Pages mial zimny cache.
+
+Pomiar powtorzony trzykrotnie, mediana:
+
+| | TTFB | DOMContentLoaded | load | zadan |
+|---|---|---|---|---|
+| strona glowna (produkcja) | 76 ms | **384 ms** | 394 ms | 21 |
+| wpis bloga (produkcja) | 79 ms | **224 ms** | 224 ms | 5 |
+| strona glowna (lokalnie) | 3 ms | 350 ms | 360 ms | 21 |
+
+Roznica miedzy strona glowna a wpisem bloga to **160 ms, a nie 2,7 sekundy**.
+
+### Ile realnie kosztuje JavaScript - zmierzone przez blokowanie
+
+Zamiast zgadywac po rozmiarze pliku, kazda biblioteka byla blokowana i mierzony
+byl czas do DOMContentLoaded (mediana z trzech przebiegow, 390 px, DPR 2):
+
+| wariant | DCL | oszczednosc |
+|---|---|---|
+| stan obecny | 366 ms | — |
+| bez SplitText | 297 ms | -69 ms |
+| bez GSAP + ScrollTrigger + SplitText | 289 ms | -77 ms |
+| bez wielkiego chunku Webflow (454 KB) | 207 ms | -159 ms |
+| **bez CALEGO JavaScriptu** | **177 ms** | **-189 ms** |
+
+Czyli caly JavaScript serwisu kosztuje **189 ms**. Planowanie dnia pracy, zeby
+odzyskac 189 ms, nie mialo sensu - i nie mialoby, nawet gdyby sie udalo.
+
+**Wniosek metodyczny, ten sam co przy bistabilnym harnessie: jeden pomiar to nie
+pomiar.** Przy zmianach CSS trzymalem pare kontrolna przez caly dzien, a liczbe
+wydajnosciowa podalem jako fakt po jednym odczycie. Kazdy pomiar czasu wymaga
+powtorzenia i mediany.
+
+### Czego NIE da sie wyciac
+
+GSAP, ScrollTrigger i SplitText wygladaly na kandydatow do usuniecia, bo w naszych
+skryptach inline GSAP robi tylko jedno: animuje liczniki `.about-hero_info-item_title`,
+a te istnieja **wylacznie na `about.html`** (2 sztuki; na index, service i blog - zero).
+SplitText nie jest w naszym kodzie wywolywany ani razu.
+
+Ale w runtime na kazdej stronie sa dziesiatki elementow z klasami `gsap_split_*`
+(58 na blogu, 78 na about, 89 na service), a w statycznym HTML nie ma ich wcale.
+Tworzy je **sam Webflow** - jego IX2 korzysta z GSAP i SplitText pod spodem.
+Usuniecie tych bibliotek zepsuloby animacje tekstu w calym serwisie.
+
+### Co faktycznie zostalo zoptymalizowane: tla sekcji
+
+Tu byl realny zysk i nie mial nic wspolnego z czasem ladowania, tylko z liczba
+bajtow - co na transferze komorkowym ma znaczenie.
+
+**Blad pierwszy: plik bez wariantow.** Tlo `.section_testimonial.is-home` to
+`69ddd...testimonial-background.webp` (139 KB) - jedyny obraz w serwisie bez
+wariantow responsywnych, bo nie bylo go na liscie w `tools/generate-webp.js`.
+Kazde urzadzenie, od telefonu po laptop, pobieralo te same 139 KB. Warianty
+wygenerowane: 400w 13 KB, 800w 31 KB, 1200w 51 KB, 1600w 71 KB.
+
+**Blad drugi: `image-set` nie widzi szerokosci okna.** `image-set()` rozroznia
+wylacznie gestosc ekranu, wiec telefon 390 px z DPR 2 dostawal wariant "2x"
+przygotowany pod desktop. Zmierzone na `.section_team`: **119 KB zamiast 63 KB**.
+Lek: te same reguly powtorzone w `@media (min-width: 768px)` i `(min-width: 1200px)`
+z przesunieta para wariantow.
+
+Zmierzone na telefonie 390 px / DPR 2, po przewinieciu calej strony:
+
+| | przed | po |
+|---|---|---|
+| tlo sekcji opinii | 139 KB | **32 KB** |
+| tlo sekcji zespolu | 119 KB | **63 KB** |
+| webp lacznie | 678 KB | **516 KB** |
+| calosc strony | 1808 KB | **1657 KB** |
+
+**163 KB mniej na samych tlach**, przy niezmienionym wygladzie.
+
+### Czego NIE bylo warto ruszac
+
+Obrazy `<img>` sprawdzone z uwzglednieniem gestosci ekranu: przy 390 px i DPR 2
+stosunek szerokosci pobranej do potrzebnej wynosi **0,94x** - czyli dobrane niemal
+idealnie. Pierwsza wersja audytu mierzyla przy DPR 1 i pokazywala "1,9x za duzo";
+to bylby falszywy alarm i naprawianie go daloby rozmyte zdjecia na telefonach.
+**Przy audycie obrazow zawsze mierzyc przy DPR 2 i 3, nie przy 1.**

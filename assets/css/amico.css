@@ -6194,3 +6194,73 @@ button.navbar-toggler-button {
 @media (prefers-reduced-motion: reduce) {
   .mapa-placeholder_btn { transition: none; }
 }
+
+/* ===== Tla sekcji dobierane do SZEROKOSCI OKNA, nie tylko do gestosci ekranu =====
+
+   `image-set()` rozroznia wylacznie DPR. Na telefonie 390 px z DPR 2 wybieral
+   wiec wariant "2x" przygotowany pod desktop - i sciagal 1200w tam, gdzie
+   potrzeba 780 px fizycznych. Zmierzone na `.section_team`: 119 KB zamiast 63 KB.
+
+   Drugi problem byl grubszy: tlo `.section_testimonial.is-home` to plik, ktory
+   zostal z Webflow (`69ddd...testimonial-background.webp`, 139 KB) i JAKO JEDYNY
+   nie mial wariantow responsywnych - nie bylo go na liscie w `tools/generate-webp.js`.
+   Kazde urzadzenie, od telefonu po laptop, pobieralo te same 139 KB. Warianty sa
+   juz wygenerowane: 400w 13 KB, 800w 31 KB, 1200w 51 KB, 1600w 71 KB.
+
+   Kazda regula ma dwie deklaracje: najpierw zwykly `url()` jako awaryjna dla
+   przegladarek bez `image-set`, potem wlasciwy `image-set`. Progi 768 i 1200 px
+   pokrywaja sie z breakpointami reszty arkusza. ===== */
+
+.section_testimonial.is-home {
+  background-image: url('../img/opt/69ddd539a343355970d2be89_testimonial-background-800w.webp') !important;
+  background-image: image-set(
+    url('../img/opt/69ddd539a343355970d2be89_testimonial-background-400w.webp') 1x,
+    url('../img/opt/69ddd539a343355970d2be89_testimonial-background-800w.webp') 2x
+  ) !important;
+}
+
+.section_team {
+  background-image: url('../img/opt/gen_team-bg-800w.webp') !important;
+  background-image: image-set(
+    url('../img/opt/gen_team-bg-400w.webp') 1x,
+    url('../img/opt/gen_team-bg-800w.webp') 2x
+  ) !important;
+}
+
+@media screen and (min-width: 768px) {
+  .section_testimonial.is-home {
+    background-image: url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1200w.webp') !important;
+    background-image: image-set(
+      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-800w.webp') 1x,
+      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1600w.webp') 2x
+    ) !important;
+  }
+
+  .section_team {
+    background-image: url('../img/opt/gen_team-bg-1200w.webp') !important;
+    background-image: image-set(
+      url('../img/opt/gen_team-bg-800w.webp') 1x,
+      url('../img/opt/gen_team-bg-1200w.webp') 2x
+    ) !important;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .section_testimonial.is-home {
+    background-image: url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1600w.webp') !important;
+    background-image: image-set(
+      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1200w.webp') 1x,
+      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1600w.webp') 2x
+    ) !important;
+  }
+
+  /* Oryginal `gen_team-bg.jpg` ma 1344 px, wiec wariantu 1600w nie ma -
+     narzedzie slusznie go pomija, zeby nie powiekszac obrazu. */
+  .section_team {
+    background-image: url('../img/opt/gen_team-bg-1200w.webp') !important;
+    background-image: image-set(
+      url('../img/opt/gen_team-bg-1200w.webp') 1x,
+      url('../img/opt/gen_team-bg-1200w.webp') 2x
+    ) !important;
+  }
+}
