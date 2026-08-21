@@ -66,6 +66,7 @@ Kazdy blok ma komentarz z uzasadnieniem. Kolejnosc od gory:
 | ~9808 | Identyfikacja bledu w formularzu | `aria-invalid` na blednym polu + `aria-describedby` wiazace je z komunikatem + przeniesienie fokusu (WCAG 3.3.1). Znacznik znika przy pierwszym znaku w polu. Czerwona ramka `#c0392b` w tym samym kolorze co komunikat, kontrast **5.44:1** (WCAG 1.4.11 wymaga 3:1 dla elementow nietekstowych). Osobna regula na `:focus`, bo `.lead-form_input:focus` przestawia ramke na primary-500 - pole gubiloby czerwien dokladnie w chwili, gdy leci na nie fokus. |
 | (HTML) | Dane strukturalne `Dentist` na podstronach | Blok dodany na `about.html` i `blog.html` - skopiowany bajt w bajt z `index.html`, zero nowych danych o firmie. Wszystkie cztery bloki dostaly wspolne `"@id": "https://amicodental.pl/#dentist"`, zeby wyszukiwarki widzialy **jeden podmiot**, a nie cztery gabinety pod tym samym adresem. `url` ujednolicony do strony glownej (wczesniej `service.html` podawal sam siebie jako adres firmy). |
 | (HTML) | Numer GSM w stopce | Stopki **wszystkich czterech stron byly identyczne** i zadna nie miala GSM - numer wisial tylko w sekcji kontaktowej na `index.html`. Dodany link `tel:+48512570035` do `.footer-contact_wrap` w czterech plikach. Bez etykiety ("GSM:"), bo przy 359 px dziala juz regula ratunkowa `overflow-wrap:anywhere` i dluzszy tekst zwiekszalby ryzyko lamania. Zmierzone na 320-1440: cel dotykowy 44 px, zero przepelnien. Domyka spojnosc NAP - oba numery ze schematu sa teraz widoczne na kazdej stronie. |
+| (CSS) | Odchudzanie, partia 1 | Wyciete 168 regul / 119 klas nieuzywanych komponentow Webflow (lightbox, wideo, formularze `w-form`, richtext, embed, stary layout `w-row`/`w-col`/`w-container`). **269,0 -> 252,4 KB (-16,6 KB)** na dysku. Po gzipie, czyli tyle ile realnie pobiera przegladarka: **38,6 -> 35,6 KB (-3,0 KB)** - martwe reguly swietnie sie kompresuja, wiec zysk sieciowy jest duzo mniejszy niz zysk w pliku i tak trzeba go raportowac. Weryfikacja: 80 odciskow stylow i geometrii, 33 732 elementy, **zero roznic**. Cieta parserem `css-tree` po strukturze, nie regexem; wycinana jest cala regula tylko wtedy, gdy KAZDY jej selektor jest martwy z powodu klasy z tej partii. |
 
 Zmiany w HTML: adres w stopce (4 pliki) + usuniety zduplikowany krotszy copyright.
 
@@ -130,7 +131,19 @@ w CSS, bo w samym HTML tego nie ma.
    tylko tekst pod przyciskiem, bylo to niescisle; po podpieciu `aria-describedby`
    staloby sie **opisem pola telefonu** czytanym przez czytnik ekranu. Teraz sa trzy
    warianty, dobierane do tego, czego faktycznie brakuje.
-4. **CSS wazy ~264 KB** przy budzecie 60 KB. Martwe reguly po Webflow.
+4. **CSS wazy 252,4 KB** przy budzecie 60 KB. Partia 1 zdjela 16,6 KB (komponenty Webflow).
+   Analiza po strukturze pokazuje **107 KB w regulach w calosci martwych**, z czego
+   najwiekszy kes to **82,9 KB wlasnych klas projektu** (ekrany, ktorych ten serwis nie ma:
+   `utilities-*`, `sales-page_*` itp.). Kolejne partie: klasy wlasne, potem ostroznie
+   nawigacja i slider.
+
+   **Nie ruszac bez namyslu:** `w-mod-touch` wyglada na martwa, bo headless Chromium nie
+   jest urzadzeniem dotykowym - a regula `html.w-mod-touch * { background-attachment:
+   scroll !important }` to realna poprawka pod iOS. Tak samo `w-mod-js/ix/ix3` i klasy CMS.
+
+   **Szum zrzutow ekranu:** 3 z 80 zrzutow (zdjecia `story-images` na `about.html`, animowane
+   przez GSAP) roznia sie miedzy przebiegami przy IDENTYCZNYM CSS. Odciski stylow i geometrii
+   sa stabilne - to one sa rozstrzygajace, nie piksele.
 5. ~~**Dane strukturalne (`Dentist`) tylko na `index.html`.**~~ **ZROBIONE 2026-08-21.**
    Sprostowanie: ten wpis byl niescisly - `service.html` mial `Dentist` (plus `FAQPage`)
    juz wczesniej. Brakowalo na `about.html` i `blog.html`; obie strony maja go teraz,
