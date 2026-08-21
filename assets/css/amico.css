@@ -5998,3 +5998,89 @@ button.navbar-toggler-button {
   display: inline-block;
   padding-block: 4px;
 }
+
+/* ===== Ocena Google pod sekcja "Jak pracujemy" =====
+   Blok siedzi w `.testimonial_block`, ktory ma tlo `primary-700` (#022f34),
+   a domyslny kolor tekstu jest tam `primary-900` - czyli prawie czarny na
+   ciemnym. Kazdy kolor ustawiamy wiec jawnie. Zmierzone na tym tle:
+   neutral-0 14,4:1, neutral-200 12,41:1 - obie daleko powyzej AA.
+
+   Gwiazdki celowo w bieli, a nie w zlocie: zloto Google to kolor spoza naszego
+   systemu tokenow, a `design-system-color` Impeccable slusznie zaplonuje na
+   twardym hexie. Sama liczba i tak niesie informacje.
+
+   Zero zewnetrznych skryptow - to jest statyczny tekst z linkiem. Zmierzone
+   loadery widzetow opinii to 44-88 KB samego wejscia, a strona glowna ma juz
+   184 KB JS i 3 s do DOMContentLoaded. ===== */
+
+.opinie-google {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-shadow--white-20);
+  color: var(--primitive-color--neutral-200);
+}
+
+.opinie-google_ocena {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+
+.opinie-google_gwiazdki {
+  color: var(--primitive-color--neutral-0);
+  font-size: 20px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.opinie-google_liczba {
+  color: var(--primitive-color--neutral-0);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.opinie-google_tekst {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--primitive-color--neutral-200);
+}
+
+.opinie-google_tekst strong { color: var(--primitive-color--neutral-0); }
+
+.opinie-google_akcje { margin: 0 0 10px; }
+
+/* Cel dotykowy jak przycisk, nie jak odnosnik w zdaniu - to jedyne przejscie
+   do prawdziwych opinii na calej stronie. */
+.opinie-google_akcje a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--color-shadow--white-40);
+  border-radius: 999px;
+  color: var(--primitive-color--neutral-0);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color .25s ease, border-color .25s ease;
+}
+
+.opinie-google_akcje a:hover {
+  background-color: var(--color-shadow--white-20);
+  border-color: var(--primitive-color--neutral-0);
+}
+
+/* Data odczytu: ocena w Google sie zmienia, a to jest statyczny HTML.
+   Bez daty strona twierdzilaby swoje jeszcze za rok. */
+.opinie-google_data {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--primitive-color--neutral-300);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opinie-google_akcje a { transition: none; }
+}

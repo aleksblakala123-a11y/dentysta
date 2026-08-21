@@ -656,3 +656,80 @@ przycisk, nie jak odnosnik w tekscie.
 **Falszywy alarm sondy, wart zapamietania:** przycisk hamburgera raportuje 18 px
 wysokosci, bo `getBoundingClientRect()` nie widzi pseudo-elementu `::after`, ktory
 powieksza obszar klikalny do 44x44 (patrz sekcja o menu mobilnym). To nie jest blad.
+---
+
+## 9. Opinie pacjentow (2026-08-21)
+
+### Sekcja obiecywala cos, czego nie miala
+
+Naglowek "Dlaczego pacjenci nam ufaja" stal nad trzema autoopisami gabinetu
+("Spokojna atmosfera", "Jasna komunikacja", "Zespol specjalistow") - czyli nad
+marketingiem podpisanym nazwiskiem gabinetu, a nie nad glosem pacjentow.
+Zmienione na **"Jak pracujemy"**, etykieta nad naglowkiem z "Dlaczego my" na
+"Nasze podejscie". Tresc slajdow bez zmian - zmienila sie obietnica, nie zawartosc.
+
+### Co udalo sie ustalic o prawdziwych opiniach
+
+| zrodlo | stan |
+|---|---|
+| **Google Business** | profil ISTNIEJE, Place ID `ChIJGbb8sEhUIkcR8cLGWtfI1UI`, wspolrzedne 51.2117, 22.6907 |
+| ocena | **4,1/5 z 62 opinii** wg agregatora porownajdentyste.pl, ktory czyta Google |
+| **ZnanyLekarz** | profil lek. dent. Malgorzaty Majewskiej: 4 opinie, ocena 4,0, tylko prywatnie, **bez rezerwacji online**; profilu samego gabinetu brak |
+| **Orly Stomatologii** | gabinet figuruje jako laureat plebiscytu w Swidniku |
+
+**Czego NIE udalo sie zweryfikowac:** liczb 4,1/62 bezposrednio u Google. Profil
+otwiera sie na scianie zgod na cookies, a klikanie "akceptuje" po to, zeby
+zescrapowac dane, to nie jest czynnosc do wykonania bez zgody wlasciciela.
+Gabinet potwierdzi liczby w panelu Google Business w kilkanascie sekund.
+Do czasu potwierdzenia w `index.html` wisi `TODO: CLIENT CONFIRMATION`.
+
+### Co zostalo wdrozone: wariant lekki
+
+Statyczny blok `.opinie-google` pod sliderem: ocena, liczba opinii, link do profilu
+Google i **data odczytu**. Zero zewnetrznych skryptow, zero widzetow.
+
+**Dlaczego nie widzet.** Zmierzone rozmiary samych loaderow:
+
+    Trustindex  loader.js     87 797 B  (~86 KB)
+    Elfsight    platform.js   44 086 B  (~43 KB)
+
+I to jest samo wejscie - potem dociagaja dane opinii, awatary i wlasne fonty.
+Strona glowna ma 184 KB JS i 3 s do DOMContentLoaded, wiec widzet to wzrost
+JavaScriptu o 25-50% na stronie, ktora juz jest za wolna. Do tego zewnetrzne
+cookies do obslugi w zgodach.
+
+**Dlaczego jest data odczytu.** Ocena w Google sie zmienia, a to jest statyczny
+HTML. Bez daty strona twierdzilaby swoje jeszcze za rok.
+
+### Dwie rzeczy, ktorych CELOWO nie ma
+
+**`AggregateRating` w danych strukturalnych.** Wytyczne Google zabraniaja firmie
+oznaczania wlasnej zbiorczej oceny do rich resultow - to podstawa do recznej kary.
+Ocena jest trescia strony, nie schema. Sprawdzone po wdrozeniu: w `index.html`
+nie ma slowa `AggregateRating`.
+
+**Tresci opinii.** Przepisanie ich z Google to scrapowanie wbrew regulaminowi
+i cudza tresc. Tresc wejdzie dopiero przez oficjalne API - patrz backlog.
+
+### Backlog: zadania wymagajace zaangazowania klienta
+
+1. **Wariant C - opinie przez Google Places API.** Tresc opinii wypiekana
+   w statyczny HTML na etapie generowania, czyli zero kosztu w przegladarce -
+   jedyna droga, ktora pokazuje opinie bez spowalniania strony.
+   **Wymaga od gabinetu:** klucza Google Places API z kontem rozliczeniowym.
+   Ograniczenia: maksymalnie 5 opinii, obowiazkowa atrybucja, cache do 30 dni,
+   wiec generator trzeba przepuszczac cyklicznie.
+2. **Orly Stomatologii.** Gabinet figuruje jako laureat plebiscytu.
+   **Wymaga od gabinetu:** potwierdzenia roku i zgody na uzycie znaku.
+   Slabszy sygnal niz opinie Google, ale darmowy.
+3. **Potwierdzenie oceny 4,1/62** w panelu Google Business.
+4. **Zbieranie opinii.** ZnanyLekarz ma dla tego gabinetu tylko 4 opinie
+   i nie oferuje rezerwacji online. Google ma 62 - i to tam warto kierowac
+   pacjentow. Najprostsza droga: krotki link (`g.page`) na karcie po wizycie.
+
+### Kontrola
+
+Blok zmierzony na 320/390/768/1440: zero poziomego scrolla, zero bledow konsoli,
+**zero zewnetrznych skryptow**, przycisk 44 px i klikalny (`elementFromPoint`),
+kontrast na tle `primary-700` - liczba 14,4:1, tekst 12,41:1, data 11,77:1,
+link 14,4:1. Wszystko daleko powyzej AA.
