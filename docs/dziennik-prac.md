@@ -390,3 +390,96 @@ Dwa wnioski:
 - **Uwazaj na skroty CSS przy wzorcu `width` + `margin-inline: auto`.** `margin: 0 0 20px`
   w pozniejszej regule cicho wylacza wysrodkowanie. Bezpieczniej `margin-block` albo
   jawne `margin: 0 auto 20px`.
+---
+
+## 7. Impeccable jako zestaw regul (2026-08-21)
+
+Przyjety jako glowny zestaw regul do audytow i szlifowania interfejsu.
+Zrodlo: `github.com/pbakaus/impeccable`, skill w wersji 4.1.1.
+
+### Co jest zainstalowane
+
+`.claude/skills/impeccable/` (152 pliki, 3,6 MB) + czterej agenci `.claude/agents/impeccable-*.md`.
+Skopiowane z klona repo, nie przez `npx impeccable install`.
+
+**`.claude/` jest w `.gitignore`** i celowo nie wchodzi do repozytorium: to narzedzie
+deweloperskie, a repo jest jednoczesnie zrodlem deployu Pages. Kto pracuje nad projektem,
+instaluje je u siebie.
+
+**`.claude/settings.json` NIE zostal skopiowany.** Zawiera hooki `PostToolUse`
+(po kazdym Edit/Write/MultiEdit) i `Stop` (na koniec kazdej tury), ktore uruchamiaja
+`node hook.mjs`. To automatyczne wykonywanie kodu przy kazdej edycji pliku - do wlaczenia
+osobna, swiadoma decyzja.
+
+### Detektor chodzi w trybie DEGRADED - i to trzeba pamietac
+
+Wbudowany `detect.mjs` sam wypisuje ostrzezenie:
+
+> HTML parser modules unavailable (htmlparser2, css-select, css-tree, domutils).
+> Falling back to regex matching. (...) findings are an undercount, not a clean bill of health.
+
+Czyli **jego "0 anti-patterns found" NIE jest zaliczeniem**. Brakuje czterech paczek npm.
+Skan URL-i (najsilniejszy tryb, na wyrenderowanym DOM) wymaga dodatkowo `puppeteer`.
+Dopoki tego nie ma, wynik detektora traktujemy jako dolne oszacowanie.
+
+Obejscie zastosowane w tej sesji: mierzalne reguly Impeccable zaimplementowane w naszym
+harnessie (`impeccable-recznie.js`), z progami wzietymi wprost z ich rejestru
+(`scripts/detector/registry/antipatterns.mjs`, 59 regul z ID i opisami).
+
+### Podzial pracy: Impeccable mowi CO, nasz harness mowi CZY
+
+To nie sa konkurencyjne narzedzia. `SKILL.src.md` Impeccable zaleca "bounded passes,
+not a loop" - zbuduj, obejrzyj raz, popraw hurtem, koniec - i nazywa otwarte self-QA
+nieefektywnym. Nasza metoda jest odwrotna i zostaje bez zmian, bo w tym projekcie
+wylapala trzy realne bledy, ktorych pojedynczy przeglad by nie zlapal (bistabilny harness,
+tlo `<button>`, kafel podpiety pod zly artykul).
+
+Ustalenie: **z Impeccable bierzemy reguly, slownictwo i strukture raportu; weryfikacja
+zostaje nasza** - para kontrolna na niezmienionym kodzie plus porownanie odciskow.
+
+### Co znalazl przy pierwszym audycie (podstrony bloga)
+
+Dwa realne naruszenia `low-contrast`, oba ponizej progu WCAG AA 4,5:1 dla malego tekstu:
+
+| element | bylo | jest |
+|---|---|---|
+| kicker `.article-kicker` (13 px) na `primary-900` | `primary-400` #587d81 = **3,82:1** | `primary-500` #24a3b1 = **5,69:1** |
+| `.article-related_item-cta` (15 px) na bialym | `primary-600` #1c91a1 = **3,74:1** | `primary-700` #022f34 = **14,4:1** |
+
+Ten sam kolor dostaly linki w tresci (`.article-body a`) - dzis ich tam nie ma, ale
+pierwszy dodany inline mialby identyczny problem.
+
+**Dlaczego nasze sondy tego nie zlapaly:** sprawdzaly kontrast WYBRANYCH elementow
+(tresc, lead, metadane, okruszki). Impeccable kaze zmierzyc KAZDY element tekstowy.
+To jest konkretna wartosc, ktora wnosi, i tak juz zostaje w sondzie.
+
+Jeden falszywy alarm - `nested-cards` na `.article-cta_button`. To moja uproszczona
+implementacja reguly zliczyla przycisk (radius 999 px, wlasne tlo) wewnatrz karty CTA.
+Przycisk w karcie to nie karta w karcie.
+
+Advisory na wszystkich szesciu wpisach: `em-dash-overuse`, od 18 do 31 myslnikow na wpis.
+Regula jest advisory, bo ludzie tez uzywaja myslnikow - ale przy tej gestosci to sygnatura
+tekstu generowanego. Do przejscia redakcyjnego.
+
+### Przy okazji: repo bylo serwowane publicznie w calosci
+
+Sprawdzajac, co sie stanie po zacommitowaniu `.claude/`, wyszlo cos wazniejszego.
+Repo mialo `.nojekyll`, wiec GitHub Pages serwowalo **cala galaz**. Zmierzone kodem
+odpowiedzi na live:
+
+    CLAUDE.md               -> 200
+    docs/dziennik-prac.md   -> 200
+    tools/generate-webp.js  -> 200
+
+Dziennik prac - z wewnetrznymi notatkami, `TODO: CLIENT CONFIRMATION` i zdaniem o tym,
+ze tresci medyczne nie byly czytane przez nikogo z gabinetu - byl publicznie dostepny
+pod adresem strony klienta. `robots.txt` ma `Allow: /`, wiec nic tego nie blokowalo.
+
+Naprawa: `.nojekyll` usuniete, dodany `_config.yml` z `exclude` na `docs`, `tools`
+i `CLAUDE.md`. Jekyll jest wlaczony **wylacznie** po to, zeby `exclude` dzialalo.
+Sprawdzone przed zmiana, ze to bezpieczne: zero wystapien `{{` i `{%` we wszystkich
+plikach HTML, JS i CSS, a pliki nie maja front mattera - Jekyll kopiuje je bez zmian.
+
+**Uwaga na przyszlosc:** od teraz deploy przechodzi przez build Jekylla. Jesli build
+padnie, strona przestanie sie aktualizowac przy zielonym pushu. Po kazdej zmianie
+struktury plikow warto sprawdzic kod odpowiedzi na live, a nie tylko `git push`.

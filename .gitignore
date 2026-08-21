@@ -1,0 +1,7 @@
+# Impeccable instalujemy lokalnie (npx impeccable install albo kopia z repo
+# pbakaus/impeccable). Do repozytorium nie wchodzi: to 152 pliki i 3,6 MB
+# narzedzia deweloperskiego, a repo jest jednoczesnie zrodlem deployu Pages.
+.claude/
+
+# Zaleznosci narzedziowe, gdyby kiedys pojawily sie w projekcie.
+node_modules/

@@ -1,0 +1,14 @@
+# GitHub Pages: konfiguracja istnieje z jednego powodu - zeby wykluczyc
+# z deployu pliki wewnetrzne. Wczesniej repo mialo `.nojekyll`, wiec Pages
+# serwowalo publicznie CALA galaz: dziennik prac, CLAUDE.md i skrypty z tools/
+# byly dostepne pod adresem strony klienta (sprawdzone: kod 200).
+#
+# Strona to statyczny eksport z Webflow bez zadnej skladni Liquid (sprawdzone:
+# zero wystapien {{ i {% we wszystkich plikach HTML, JS i CSS), a pliki nie maja
+# front mattera - Jekyll kopiuje je wiec bez zmian. Wlaczamy go WYLACZNIE po to,
+# zeby dzialalo `exclude`.
+exclude:
+  - docs
+  - tools
+  - CLAUDE.md
+  - .gitignore

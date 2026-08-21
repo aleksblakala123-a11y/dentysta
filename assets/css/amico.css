@@ -5472,6 +5472,14 @@ html {
   margin-inline: auto;
 }
 
+/* Kontrast po audycie Impeccable (regula low-contrast, WCAG AA).
+   Zmierzone na renderze: kicker mial primary-400 (#587d81) na primary-900
+   (#011f23) = 3.82:1 przy 13 px, a "Czytaj wiecej" w kaflu powiazanych
+   primary-600 (#1c91a1) na bialym = 3.74:1 przy 15 px. Oba ponizej progu 4.5
+   dla malego tekstu. Podmienione na primary-500 (5.69:1) i primary-700
+   (14.4:1). Ten sam kolor dostaly linki w tresci - dzis ich tam nie ma, ale
+   pierwszy dodany inline mialby dokladnie ten sam problem. */
+
 /* --- naglowek na ciemnym pasie --- */
 
 .article-head {
@@ -5512,7 +5520,7 @@ html {
   font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--primitive-color--primary-400);
+  color: var(--primitive-color--primary-500);
 }
 
 .article-title {
@@ -5628,7 +5636,7 @@ html {
 .article-steps li { margin-bottom: 14px; }
 
 .article-body a {
-  color: var(--primitive-color--primary-600);
+  color: var(--primitive-color--primary-700);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -5781,7 +5789,7 @@ html {
 
 .article-related_item-cta {
   font-size: 15px;
-  color: var(--primitive-color--primary-600);
+  color: var(--primitive-color--primary-700);
 }
 
 .article-related_note { margin: 0; }
