@@ -733,3 +733,58 @@ Blok zmierzony na 320/390/768/1440: zero poziomego scrolla, zero bledow konsoli,
 **zero zewnetrznych skryptow**, przycisk 44 px i klikalny (`elementFromPoint`),
 kontrast na tle `primary-700` - liczba 14,4:1, tekst 12,41:1, data 11,77:1,
 link 14,4:1. Wszystko daleko powyzej AA.
+---
+
+## 10. CTA w hero (2026-08-21)
+
+Przycisk w hero na `index.html` mial etykiete "Umow wizyte" i `href="tel:+48814580029"`.
+Na telefonie to dziala, na desktopie otwiera dialer albo nic - a stoi 200 px nad
+formularzem, ktory te sama robote wykonuje poprawnie.
+
+### Rozstrzygniecie znalazlo sie w samym kodzie
+
+Przegladajac wszystkie linki `tel:` w serwisie: **to byl jedyny z etykieta
+"Umow wizyte"**. Pozostale mowia "Zadzwon", "Zadzwon teraz", "Zadzwon: 81 458 00 29"
+i "Rejestracja: 81 458 00 29". Czyli nie jest to kwestia gustu - to byla jedna
+pozycja odstajaca od konwencji, ktora reszta serwisu juz stosuje.
+
+Zmienione na **"Zadzwon: 81 458 00 29"**, `href` bez zmian.
+
+### Dlaczego nie wariant adaptacyjny (przewijanie do formularza na desktopie)
+
+Rozwazany i odrzucony po pomiarze. Przy 1440x900 przycisk jest na y=515,
+a formularz zaczyna sie na y=710 - **oba w tym samym oknie**. "Przewin do
+formularza" przesunelby widok o ~200 px albo o nic, wiec interakcja wygladalaby
+na zepsuta. Dzialalby dopiero skok fokusu do pierwszego pola, ale to juz JS
+rozgalezajacy sie po szerokosci okna, przycisk mowiacy co innego na telefonie
+i na laptopie, i kolejne zachowanie do testowania.
+
+Wybrany wariant nie ma zadnego JS-a i dziala identycznie na kazdej szerokosci.
+
+### Trzy rzeczy, ktore ta zmiana zalatwia przy okazji
+
+1. **Znika zdublowana etykieta.** "Umow wizyte" bylo dwa razy w jednym oknie -
+   na przycisku (ktory dzwonil) i w naglowku formularza 20 px nizej (ktory
+   faktycznie umawia). Teraz sa dwie rozne sciezki, kazda opisana zgodnie z tym,
+   co robi.
+2. **Numer jest widoczny bez klikania.** Na desktopie uzytkownik czyta numer
+   zamiast trafiac w dialer; na telefonie dalej dziala jednym dotknieciem.
+3. **Numer zostaje w pierwszym ekranie na mobile.** CTA w pasku ma klase
+   `hide-mobile`, wiec ponizej 768 px ten przycisk jest JEDYNYM numerem telefonu
+   w pierwszym ekranie. Gdyby zmienil sie w przycisk do formularza, numer
+   zniknalby z pierwszego ekranu na najwazniejszym urzadzeniu.
+
+### Pomiar
+
+| szerokosc | przycisk | etykieta w liniach | klikalny | poziomy scroll | pierwszy widoczny `tel:` |
+|---|---|---|---|---|---|
+| 320 px | 288x58 | 1 | tak | 0 | y=473 (0,56 ekranu) |
+| 390 px | 358x58 | 1 | tak | 0 | y=406 (0,48 ekranu) |
+| 768 px | 256x58 | 1 | tak | 0 | y=8 (pasek) |
+| 1440 px | 260x58 | 1 | tak | 0 | y=9 (pasek) |
+
+Etykieta miesci sie w jednej linii nawet przy 320 px. Klikalnosc sprawdzana
+przez `elementFromPoint` na srodku przycisku, nie po samym istnieniu elementu.
+
+Zmiana to jedna linia w jednym pliku, **bez dotykania CSS** - wiec `?v=` zostaje
+na `20260821k`.
