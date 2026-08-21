@@ -208,26 +208,6 @@ td, th {
   font-family: ui-glyph-icons !important;
 }
 
-.w-icon-slider-right:before {
-  content: "";
-}
-
-.w-icon-slider-left:before {
-  content: "";
-}
-
-.w-icon-arrow-down:before, .w-icon-dropdown-toggle:before {
-  content: "";
-}
-
-.w-icon-file-upload-remove:before {
-  content: "";
-}
-
-.w-icon-file-upload-icon:before {
-  content: "";
-}
-
 * {
   box-sizing: border-box;
 }
@@ -256,145 +236,13 @@ html.w-mod-touch * {
   background-attachment: scroll !important;
 }
 
-.w-block {
-  display: block;
-}
-
 .w-inline-block {
   max-width: 100%;
   display: inline-block;
 }
 
-.w-clearfix:before, .w-clearfix:after {
-  content: " ";
-  grid-area: 1 / 1 / 2 / 2;
-  display: table;
-}
-
-.w-clearfix:after {
-  clear: both;
-}
-
-.w-hidden {
-  display: none;
-}
-
-.w-button {
-  color: #fff;
-  line-height: inherit;
-  cursor: pointer;
-  background-color: #3898ec;
-  border: 0;
-  border-radius: 0;
-  padding: 9px 15px;
-  text-decoration: none;
-  display: inline-block;
-}
-
-input.w-button {
-  -webkit-appearance: button;
-}
-
 html[data-w-dynpage] [data-w-cloak] {
   color: #0000 !important;
-}
-
-.w-code-block {
-  margin: unset;
-}
-
-pre.w-code-block code {
-  all: inherit;
-}
-
-pre.w-code-block code > span {
-  display: block !important;
-}
-
-.w-optimization {
-  display: contents;
-}
-
-.w-legacy-badge, .w-legacy-badge > img {
-  box-sizing: unset;
-  width: unset;
-  height: unset;
-  max-height: unset;
-  max-width: unset;
-  min-height: unset;
-  min-width: unset;
-  margin: unset;
-  padding: unset;
-  float: unset;
-  clear: unset;
-  border: unset;
-  border-radius: unset;
-  background: unset;
-  background-image: unset;
-  background-position: unset;
-  background-size: unset;
-  background-repeat: unset;
-  background-origin: unset;
-  background-clip: unset;
-  background-attachment: unset;
-  background-color: unset;
-  box-shadow: unset;
-  transform: unset;
-  direction: unset;
-  font-family: unset;
-  font-weight: unset;
-  color: unset;
-  font-size: unset;
-  line-height: unset;
-  font-style: unset;
-  font-variant: unset;
-  text-align: unset;
-  letter-spacing: unset;
-  -webkit-text-decoration: unset;
-  text-decoration: unset;
-  text-indent: unset;
-  text-transform: unset;
-  list-style-type: unset;
-  text-shadow: unset;
-  vertical-align: unset;
-  cursor: unset;
-  white-space: unset;
-  word-break: unset;
-  word-spacing: unset;
-  word-wrap: unset;
-  transition: unset;
-}
-
-.w-legacy-badge {
-  white-space: nowrap;
-  cursor: pointer;
-  box-shadow: 0 0 0 1px #0000001a, 0 1px 3px #0000001a;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 2147483647 !important;
-  color: #aaadb0 !important;
-  width: auto !important;
-  height: auto !important;
-  overflow: unset !important;
-  background-color: #fff !important;
-  border-radius: 3px !important;
-  margin: 0 !important;
-  padding: 6px !important;
-  font-size: 12px !important;
-  line-height: 14px !important;
-  text-decoration: none !important;
-  display: inline-block !important;
-  position: fixed !important;
-  inset: auto 12px 12px auto !important;
-  transform: none !important;
-}
-
-.w-legacy-badge > img {
-  position: unset;
-  visibility: unset !important;
-  opacity: 1 !important;
-  vertical-align: middle !important;
-  display: inline-block !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -466,11 +314,6 @@ ul, ol {
   padding-left: 40px;
 }
 
-.w-list-unstyled {
-  padding-left: 0;
-  list-style: none;
-}
-
 .w-embed:before, .w-embed:after {
   content: " ";
   grid-area: 1 / 1 / 2 / 2;
@@ -497,216 +340,6 @@ label {
   margin-bottom: 5px;
   font-weight: bold;
   display: block;
-}
-
-.w-file-remove-link {
-  cursor: pointer;
-  width: auto;
-  height: auto;
-  margin-top: 3px;
-  margin-left: 10px;
-  padding: 3px;
-  display: block;
-}
-
-.w-icon-file-upload-remove {
-  margin: auto;
-  font-size: 10px;
-}
-
-.w-icon-file-upload-icon, .w-icon-file-upload-uploading {
-  width: 20px;
-  margin-right: 8px;
-  display: inline-block;
-}
-
-.w-icon-file-upload-uploading {
-  height: 20px;
-}
-
-.w-hidden-main {
-  display: none !important;
-}
-
-@media screen and (max-width: 991px) {
-  .w-hidden-main {
-    display: inherit !important;
-  }
-
-  .w-hidden-medium {
-    display: none !important;
-  }
-
-  }
-
-@media screen and (max-width: 767px) {
-  .w-hidden-main, .w-hidden-medium {
-    display: inherit !important;
-  }
-
-  .w-hidden-small {
-    display: none !important;
-  }
-
-  }
-
-@media screen and (max-width: 479px) {
-  .w-hidden-main, .w-hidden-medium, .w-hidden-small {
-    display: inherit !important;
-  }
-
-  .w-hidden-tiny {
-    display: none !important;
-  }
-
-  }
-
-.w-widget {
-  position: relative;
-}
-
-.w-widget-map {
-  width: 100%;
-  height: 400px;
-}
-
-.w-widget-map label {
-  width: auto;
-  display: inline;
-}
-
-.w-widget-map img {
-  max-width: inherit;
-}
-
-.w-widget-twitter {
-  overflow: hidden;
-}
-
-.w-widget-twitter-count-shim {
-  vertical-align: top;
-  text-align: center;
-  background: #fff;
-  border: 1px solid #758696;
-  border-radius: 3px;
-  width: 28px;
-  height: 20px;
-  display: inline-block;
-  position: relative;
-}
-
-.w-widget-twitter-count-shim * {
-  pointer-events: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.w-widget-twitter-count-shim .w-widget-twitter-count-inner {
-  text-align: center;
-  color: #999;
-  font-family: serif;
-  font-size: 15px;
-  line-height: 12px;
-  position: relative;
-}
-
-.w-widget-twitter-count-shim .w-widget-twitter-count-clear {
-  display: block;
-  position: relative;
-}
-
-.w-widget-twitter-count-shim.w--large {
-  width: 36px;
-  height: 28px;
-}
-
-.w-widget-twitter-count-shim.w--large .w-widget-twitter-count-inner {
-  font-size: 18px;
-  line-height: 18px;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical) {
-  margin-left: 5px;
-  margin-right: 8px;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical).w--large {
-  margin-left: 6px;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical):before, .w-widget-twitter-count-shim:not(.w--vertical):after {
-  content: " ";
-  pointer-events: none;
-  border: solid #0000;
-  width: 0;
-  height: 0;
-  position: absolute;
-  top: 50%;
-  left: 0;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical):before {
-  border-width: 4px;
-  border-color: #75869600 #5d6c7b #75869600 #75869600;
-  margin-top: -4px;
-  margin-left: -9px;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical).w--large:before {
-  border-width: 5px;
-  margin-top: -5px;
-  margin-left: -10px;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical):after {
-  border-width: 4px;
-  border-color: #fff0 #fff #fff0 #fff0;
-  margin-top: -4px;
-  margin-left: -8px;
-}
-
-.w-widget-twitter-count-shim:not(.w--vertical).w--large:after {
-  border-width: 5px;
-  margin-top: -5px;
-  margin-left: -9px;
-}
-
-.w-widget-twitter-count-shim.w--vertical {
-  width: 61px;
-  height: 33px;
-  margin-bottom: 8px;
-}
-
-.w-widget-twitter-count-shim.w--vertical:before, .w-widget-twitter-count-shim.w--vertical:after {
-  content: " ";
-  pointer-events: none;
-  border: solid #0000;
-  width: 0;
-  height: 0;
-  position: absolute;
-  top: 100%;
-  left: 50%;
-}
-
-.w-widget-twitter-count-shim.w--vertical:before {
-  border-width: 5px;
-  border-color: #5d6c7b #75869600 #75869600;
-  margin-left: -5px;
-}
-
-.w-widget-twitter-count-shim.w--vertical:after {
-  border-width: 4px;
-  border-color: #fff #fff0 #fff0;
-  margin-left: -4px;
-}
-
-.w-widget-twitter-count-shim.w--vertical .w-widget-twitter-count-inner {
-  font-size: 18px;
-  line-height: 22px;
-}
-
-.w-widget-twitter-count-shim.w--vertical.w--large {
-  width: 76px;
 }
 
 .w-slider {
@@ -768,14 +401,6 @@ label {
   box-shadow: 0 0 3px #3336;
 }
 
-.w-slider-nav-invert {
-  color: #fff;
-}
-
-.w-slider-nav-invert > div {
-  background-color: #2226;
-}
-
 .w-slider-nav-invert > div.w-active {
   background-color: #222;
 }
@@ -835,13 +460,6 @@ label {
 .w-slider-arrow-right {
   z-index: 4;
   left: auto;
-}
-
-.w-icon-slider-left, .w-icon-slider-right {
-  width: 1em;
-  height: 1em;
-  margin: auto;
-  inset: 0;
 }
 
 .w-slider-aria-label {
@@ -1088,10 +706,6 @@ label {
   .w-tab-link {
     display: block;
   }
-}
-
-.w-ix-emptyfix:after {
-  content: "";
 }
 
 @keyframes spin {

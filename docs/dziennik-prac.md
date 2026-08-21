@@ -131,21 +131,30 @@ w CSS, bo w samym HTML tego nie ma.
    tylko tekst pod przyciskiem, bylo to niescisle; po podpieciu `aria-describedby`
    staloby sie **opisem pola telefonu** czytanym przez czytnik ekranu. Teraz sa trzy
    warianty, dobierane do tego, czego faktycznie brakuje.
-4. **CSS wazy 170,3 KB** przy budzecie 60 KB. Partia 1 zdjela 16,6 KB (komponenty Webflow),
-   partia 2 kolejne **76,9 KB** (wlasne klasy szablonu: strony, ktorych ten serwis nie ma -
-   `sales-page_*`, `utilities-*`, `job-*`, `awards-*`, `team-*`, `marquee_*`, `legal-aside_*`;
-   425 regul, 244 klasy), partia 3 jeszcze **5,2 KB** (nawigacja i rozwijane menu: 34 reguly,
-   18 klas). Lacznie 98,7 KB, z 269,0 do 170,3 KB. Po gzipie 38,6 -> 29,3 KB.
+4. **CSS wazy 163,1 KB** przy budzecie 60 KB. Cztery partie:
 
-   Zostalo **11,3 KB regul w calosci martwych**: 6,8 KB komponenty Webflow (`w-*`),
-   4,3 KB reguly zablokowane guardem, 0,2 KB chronione `w-mod-*`. Kubelek nawigacji jest
-   pusty - partia 3 wziela z niego wszystko. Budzet 60 KB liczony po dysku jest dla tego
-   arkusza nieosiagalny: nawet po wycieciu wszystkiego martwego zostaje ~159 KB zywych
-   regul Webflow. Sensownym celem jest gzip, bo to on leci po sieci.
+   | partia | zakres | zdjete |
+   |---|---|---|
+   | 1 | komponenty Webflow bez zastosowania (lightbox, wideo, formularze, layout) | 16,6 KB |
+   | 2 | wlasne klasy szablonu (`sales-page_*`, `utilities-*`, `job-*`, `team-*`...) | 76,9 KB |
+   | 3 | nawigacja i rozwijane menu | 5,2 KB |
+   | 4 | pozostale komponenty Webflow (widgety, helpery, ikony, slider-nav-invert) | 7,2 KB |
+
+   Razem **105,9 KB**: z 269,0 do 163,1 KB (-39%). Po gzipie 38,6 -> 28,1 KB (-27%).
+
+   **To jest podloga tej metody.** Zostalo 4,5 KB regul w calosci martwych i zadnej z nich
+   nie da sie ruszyc bez zmiany zasad: 4,3 KB blokuje guard (reguly typu `.martwa .zywa`),
+   0,2 KB to swiadomie chronione `w-mod-*` i klasy CMS. Wszystkie kubelki "do kolejnej
+   partii" sa puste. Dalsze odchudzanie wymagaloby juz nie usuwania martwych regul, tylko
+   ruszania zywych - czyli refaktoru stylow, a nie sprzatania po szablonie.
+
+   Budzet 60 KB liczony po dysku jest dla tego arkusza nieosiagalny: po wycieciu wszystkiego
+   martwego zostaje ~159 KB zywych regul Webflow. Sensownym celem jest gzip, bo to on leci
+   po sieci - i tam jestesmy na 28,1 KB.
 
    **Uwaga przy porownywaniu rozmiarow:** na dysku plik ma CRLF, a git normalizuje konce
    linii do LF. Blob w repo i plik serwowany przez Pages sa wiec o tyle bajtow mniejsze,
-   ile plik ma linii (przy 170,3 KB to ok. 5,8 KB roznicy). To nie jest zaden ubytek tresci.
+   ile plik ma linii (przy 163,1 KB to ok. 5,3 KB roznicy). To nie jest zaden ubytek tresci.
 
    **Guard "wszystkie klasy w regule martwe" zostaje**, mimo ze kosztuje 4,3 KB
    niewycietych regul typu `.martwa .zywa` (takie faktycznie nie maja szans dopasowania).
@@ -161,6 +170,21 @@ w CSS, bo w samym HTML tego nie ma.
    `navbar_link`, `navbar-toggler-button`, `w-nav`, `w-nav-menu`, `w-nav-button`,
    `w-nav-brand`, `w-nav-overlay`, `skip-link`) sa nietkniete - kosiarka ma twarda polise:
    jesli po cieciu ktorakolwiek z nich znika z arkusza, plik w ogole nie zostaje zapisany.
+
+   **Partia 4 (komponenty Webflow) - ZROBIONA 2026-08-21.** clearfix, `w-button`,
+   `w-code-block`, `w-legacy-badge`, ikony file-upload, helpery `w-hidden-*`, widget mapy,
+   widget Twittera, `w-ix-emptyfix` oraz - z okolic slidera - `w-slider-nav-invert`
+   i glify `w-icon-slider-left/right`. **Slider opinii dziala i jest uzywany**, wiec jego
+   zywe klasy (`w-slider`, `w-slider-mask`, `w-slider-nav`, `w-slider-arrow-left/right`,
+   `w-slide`, `w-round`) nie byly nawet kandydatami; ta sama polisa co w partii 3 pilnowala
+   18 klas komponentow, ktore ta strona realnie ma.
+
+   **Klasa, ktorej JS SZUKA, to nie to samo, co klasa, ktora JS DOKLADA.** Dwie nazwy
+   z partii 4 wystepuja w `webflow.js`: `w-nav-link` i `w-icon-dropdown-toggle` - ale
+   w obu przypadkach jako selektory (`.find(".w-nav-link")`), czyli miejsca, gdzie skrypt
+   szuka elementow. W markupie ich nie ma, wiec selektor trafia w pustke i CSS jest
+   niepotrzebny. Gdyby JS te klasy DOKLADAL, zobaczylby je przebieg inwentarza w DOM.
+   Rozroznienie warto robic za kazdym razem, bo goly grep po plikach JS tego nie widzi.
 
    **Nie ruszac bez namyslu:** `w-mod-touch` wyglada na martwa, bo headless Chromium nie
    jest urzadzeniem dotykowym - a regula `html.w-mod-touch * { background-attachment:
