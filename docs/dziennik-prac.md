@@ -118,53 +118,85 @@ w CSS, bo w samym HTML tego nie ma.
    wyszlo, ze pasek ma `height:auto`, wiec przy **768-991 px mierzy 67 px, a nie 69**;
    wysokosc jest teraz mierzona w JS i publikowana jako `--navbar-h` / `--navbar-inner-h`,
    zamiast stalych zgadywanych per breakpoint.
-2. **Podstrony bloga: wzorzec GOTOWY 2026-08-21, zostaje 5 wpisow.**
-   Pierwszy realny artykul: `blog/jak-prawidlowo-szczotkowac-zeby.html` - wyrozniony wpis
-   z `blog.html`, podlinkowany stamtad z trzech miejsc. Pozostale piec tytulow celowo
-   nadal prowadzi do `blog.html`, zeby nie robic martwych odnosnikow.
+2. ~~**Podstrony bloga nie istnieja.**~~ **ZROBIONE 2026-08-21. Wszystkie szesc wpisow
+   ma swoje strony**, a na `blog.html` nie ma juz ani jednego kafla prowadzacego sam do
+   siebie.
 
-   **Konwencja:** `blog/<slug>.html`, zasoby przez `../assets/...`. Podkatalog, bo przy
-   szesciu wpisach root przestaje byc czytelny, a `/blog/slug.html` lepiej wyglada w SERP.
+   | plik | obraz | slow |
+   |---|---|---|
+   | `blog/jak-prawidlowo-szczotkowac-zeby.html` | 4 | 954 |
+   | `blog/mity-o-zebach.html` | 6 | 857 |
+   | `blog/nic-dentystyczna.html` | 5 | 728 |
+   | `blog/produkty-szkodzace-zebom.html` | 3 | 616 |
+   | `blog/wybielanie-zebow.html` | 2 | 782 |
+   | `blog/codzienne-nawyki-dla-zebow.html` | 1 | 664 |
 
-   **Uklad strony:** ciemny pas naglowka (okruszki, kicker, H1, lead, metadane) -> obraz
-   wiodacy -> ramka "W skrocie" -> spis tresci z kotwicami -> tresc H2/H3 -> tabela
-   "blad / dlaczego szkodzi / jak poprawic" -> FAQ -> zastrzezenie -> CTA -> powiazane wpisy.
-   Dane strukturalne: `BlogPosting` + `BreadcrumbList` + `FAQPage` w jednym `@graph`,
-   spiete z istniejacym wezlem `Dentist` przez `@id`.
+   **Konwencja:** `blog/<slug>.html`, zasoby przez `../assets/...`. Uklad: ciemny pas
+   naglowka (okruszki, kicker, H1, lead, metadane) -> obraz wiodacy -> ramka "W skrocie"
+   -> spis tresci z kotwicami -> tresc H2/H3 -> tabela -> FAQ -> zastrzezenie -> CTA ->
+   powiazane wpisy. Dane strukturalne: `BlogPosting` + `BreadcrumbList` + `FAQPage`
+   w jednym `@graph`, spiete z wezlem `Dentist` przez `@id`.
 
-   **DLACZEGO NAGLOWEK JEST CIEMNY.** Nie z powodow estetycznych. `.navbar_wrap` jest
-   przezroczysty do pierwszego przewiniecia, linki maja kolor #f3f6ff, logo jest w wariancie
-   jasnym - pasek zaprojektowano pod ciemne hero. Na bialej stronie artykulu nawigacja
-   bylaby bialym tekstem na bialym tle. Ciemny pas rozwiazuje to bez wyjatku w regulach paska.
+   **STRONY SA GENEROWANE, NIE KOPIOWANE.** Pierwszy wpis powstal recznie; przy szesciu
+   to przestaje miec sens, bo kazda kopia to szansa na cichy rozjazd. Generator
+   (`generator.js` w scratchpadzie) sklada z jednego zrodla: `<head>` z meta i JSON-LD,
+   okruszki, metadane, CTA, zastrzezenie, "przeczytaj takze" - a takze dwie rzeczy,
+   ktore wczesniej trzeba bylo pilnowac recznie:
+   - **spis tresci powstaje WPROST z naglowkow `<h2 id>` w tresci**, wiec kotwica nie moze
+     rozjechac sie z linkiem,
+   - **FAQ widoczne i blok `FAQPage` pochodza z tej samej tablicy**, wiec czytelnik
+     i wyszukiwarka zawsze widza identyczne pytania. Sonda i tak porownuje jedno z drugim.
 
-   **ARTYKUL NIE LADUJE jQuery, WEBFLOW ANI GSAP.** Strony nawigacyjne ciagna 714 KB JS
-   (179 KB po gzipie) - szescikrotnosc calego CSS po czterech partiach odchudzania. Artykul
-   to sam tekst; potrzebuje wylacznie dzialajacego menu. Menu obsluguje ~45 linii wlasnego
-   skryptu, ktory odtwarza DOKLADNIE te zmiany w DOM, na ktorych opiera sie CSS: `.w--open`
-   na przycisku, `.w-nav-overlay` w `.navbar_wrap`, `data-nav-menu-open` na `<nav>`.
-   Skrypty wspoldzielone (pasek `.is-scrolled`, pulapka fokusu, oslona obrazkow) sa wyjmowane
-   z `blog.html` PROGRAMOWO przy skladaniu pliku, wiec nie rozjada sie z reszta serwisu.
+   Tresc merytoryczna kazdego wpisu siedzi osobno w `tresc/<slug>.html` i sklada sie
+   wylacznie z sekcji `<section aria-labelledby>` z `<h2 id>`.
+
+   **DLACZEGO NAGLOWEK JEST CIEMNY.** `.navbar_wrap` jest przezroczysty do pierwszego
+   przewiniecia, linki maja kolor #f3f6ff, logo jest w wariancie jasnym - pasek
+   zaprojektowano pod ciemne hero. Na bialej stronie artykulu nawigacja bylaby bialym
+   tekstem na bialym tle.
+
+   **ARTYKULY NIE LADUJA jQuery, WEBFLOW ANI GSAP.** Strony nawigacyjne ciagna 714 KB JS
+   (179 KB po gzipie). Artykul to sam tekst; menu obsluguje ~45 linii wlasnego skryptu,
+   odtwarzajacego dokladnie te zmiany w DOM, na ktorych opiera sie CSS: `.w--open` na
+   przycisku, `.w-nav-overlay` w `.navbar_wrap`, `data-nav-menu-open` na `<nav>`. Skrypty
+   wspoldzielone (pasek `.is-scrolled`, pulapka fokusu, oslona obrazkow) sa wyjmowane
+   z `blog.html` programowo przy kazdym generowaniu.
 
    Efekt uboczny na plus: bez `webflow.js` nie ma przechwytywania kotwic, wiec skip link
-   i spis tresci przenosza fokus natywnie - lata z sekcji 4 nie jest tu potrzebna.
+   i spis tresci przenosza fokus natywnie. Skok ze spisu tresci nie chowa naglowka pod
+   paskiem, bo `html` ma juz `scroll-padding-top: calc(var(--navbar-h) + 8px)` z prac nad
+   przyklejonym paskiem - zmierzone: naglowek laduje 8 px pod dolna krawedzia paska.
 
-   **Hamburger to `<button>`, nie `<div role="button">`.** Bez webflow.js nikt nie dokłada
-   ARIA ani obslugi klawiatury, a natywny `<button>` daje jedno i drugie za darmo.
-   Pulapka, ktora to kosztowalo: przegladarka nadaje `<button>` wlasne tlo
-   (`rgb(240, 240, 240)`), czyli jasny prostokat 24x18 px na ciemnym pasku. Geometria byla
-   identyczna jak w `<div>`, wiec porownanie pudelek tego NIE pokazalo - wyszlo dopiero
-   przy liczeniu kontrastu, gdy tlem okazal sie sam przycisk zamiast paska. Reset jest
-   w arkuszu; `all: unset` odpada, bo skasowalby tez reguly Webflow ustawiajace ten przycisk.
+   **Hamburger to `<button>`, nie `<div role="button">`** - bez webflow.js nikt nie dokłada
+   ARIA ani obslugi klawiatury. Pulapka, ktora to kosztowalo: przegladarka nadaje
+   `<button>` wlasne tlo `rgb(240, 240, 240)`, czyli jasny prostokat 24x18 px na ciemnym
+   pasku. Geometria byla identyczna jak w `<div>`, wiec porownanie pudelek tego NIE
+   pokazalo - wyszlo przy liczeniu kontrastu, gdy tlem okazal sie sam przycisk.
+
+   **DWA BLEDY Z DRUGIEJ PARTII, WARTE ZAPAMIETANIA:**
+
+   *Podpinanie linkow "od tytulu w tyl" zjada sasiada.* Pierwsza wersja skryptu szukala
+   najblizszego POPRZEDZAJACEGO `<a href="blog.html">`. Kafel o szczotkowaniu byl juz
+   podpiety z poprzedniej sesji, wiec wyszukiwanie przeskoczylo na kafel wyzej i kafel
+   "Prawda o nici dentystycznej" dostal adres artykulu o szczotkowaniu - a licznik
+   "kafli prowadzacych do blog.html: 0" pokazywal sukces. Poprawka: dopasowywac CALY
+   kafel jednym wyrazeniem i ustawiac href na podstawie tytulu, ktory ten kafel zawiera.
+   Skrypt jest wtedy idempotentny. **Wniosek: przy podmianie linkow sprawdzaj mapowanie
+   kafel -> adres, a nie liczbe pozostalych starych linkow.**
+
+   *Obraz i alt nie zgadzaly sie z kaflem.* Pierwszy artykul dostal `gen_blog-image-1`
+   z opisem "szczoteczka i pasta na blacie", podczas gdy zdjecie 1 przedstawia szczoteczke,
+   nic i model szczeki - i nalezy do kafla "5 codziennych nawykow". Kazdy wpis ma teraz
+   obraz swojego kafla i alt przepisany z `blog.html`, wiec klikniecie kafla prowadzi na
+   strone z tym samym zdjeciem.
 
    **TODO: CLIENT CONFIRMATION** - podpis autora (konkretny lekarz z tytulem czy "Zespol
-   Amico Dental") oraz data publikacji. Dotyczy tresci widocznej i pola `author`
-   w danych strukturalnych.
+   Amico Dental") i data publikacji, na wszystkich szesciu wpisach naraz. Dotyczy tresci
+   widocznej i pola `author` w danych strukturalnych.
 
-   **Jak dodac kolejny wpis:** skopiowac plik wzorcowy, podmienic tresc, `<title>`,
-   `description`, OG, `canonical`, `@id`/`url` w JSON-LD, FAQ, obraz wiodacy i powiazane
-   wpisy; podpiac link w `blog.html`; dopisac `<url>` w `sitemap.xml`. Chrome (pasek,
-   stopka, skrypty) zostawic bez zmian - jesli zmienia sie w `blog.html`, przeniesc je
-   ponownie skryptem, a nie recznie.
+   **Jak dodac siodmy wpis:** dopisac obiekt do tablicy `WPISY` w generatorze, dorzucic
+   `tresc/<slug>.html` z sekcjami, uruchomic generator, potem skrypt podpinajacy linki
+   i sitemap, na koniec sonde `artykuly.js`. Chrome nie dotykac - przenosi sie sam.
 3. ~~**Pola formularza nie maja etykiet.**~~ **ZROBIONE 2026-08-21.** Widoczne etykiety
    zamiast placeholderow. Formularz jest **tylko na `index.html`** - podstrony go nie maja.
    Domkniete tego samego dnia: bledne pole dostaje `aria-invalid`, jest wiazane
