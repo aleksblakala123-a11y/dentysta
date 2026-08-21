@@ -1,0 +1,47 @@
+[
+ {
+  "kategoria": "Medycyna estetyczna",
+  "pozycje": [
+   {
+    "nazwa": "Konsultacja specjalistyczna",
+    "cena": "180 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Toksyna botulinowa : redukcja zmarszczek mimicznych",
+    "cena": "600-1200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Mezoterapia igłowa twarz lub szyja - 500-1300 zł; twarz+szyja- 800-1500 zł; twarz+szyja+dekolt- 1000-1700 zł",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Mezoterapia przy użyciu fibryny bogatopłytkowej - twarz- 900 zł; twarz+szyja- 1100 zł",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Wypełnianie zmarszczek kwasem hialuronowym: bruzdy nosowo-wargowe, linie marionetek i zmarszczki pon kącików ust, zmarszczki palacza, wypełnienie doliny łez- od 800 zł (cena za 1ml)",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Wolumetria twarzy 1ml- 1100 zł/ 2ml- 2000 zł",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Mezoterapia głowy w zależności od substancji i ilości zabiegów",
+    "cena": "700-3000 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Peelingi/ chemiczna biorewitalizacja: PRX -T33 twarz-300 zł/ twarz+szyja- 400 zł/ twarz+szyja+dekolt- 200 zł",
+    "cena": null,
+    "calosc": true
+   }
+  ]
+ }
+]

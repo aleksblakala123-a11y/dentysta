@@ -962,3 +962,102 @@ stosunek szerokosci pobranej do potrzebnej wynosi **0,94x** - czyli dobrane niem
 idealnie. Pierwsza wersja audytu mierzyla przy DPR 1 i pokazywala "1,9x za duzo";
 to bylby falszywy alarm i naprawianie go daloby rozmyte zdjecia na telefonach.
 **Przy audycie obrazow zawsze mierzyc przy DPR 2 i 3, nie przy 1.**
+
+## 13. WERSJA DEMONSTRACYJNA: noindex na calej witrynie (2026-08-22)
+
+> **PUNKT KRYTYCZNY DO USUNIECIA PRZY PRZEJSCIU NA DOMENE KLIENTA.**
+> Dopoki ten znacznik jest w plikach, strona **nie pojawi sie w Google**. To jest
+> zamierzone tylko dla wersji pokazowej. Przy uruchomieniu na docelowej domenie
+> usuniecie go jest pierwsza czynnoscia, przed czymkolwiek innym.
+
+### Co bylo nie tak
+
+Ta witryna to probka do pokazania klientowi, ale stala pod adresem github.io
+**bez zadnej blokady indeksowania**. Stan przed zmiana, zmierzony:
+
+```
+robots.txt:                Allow: /        (roboty maja wolna droge)
+meta robots na stronach:   0 z 16
+```
+
+Sam canonical nie chronil, bo wskazywal na adresy, ktorych na docelowej domenie
+jeszcze nie ma - sprawdzone zadaniem HTTP:
+
+```
+https://amicodental.pl/index.html   ->  404
+https://amicodental.pl/cennik.html  ->  404
+```
+
+Canonical prowadzacy do 404 jest przez wyszukiwarke ignorowany. Do indeksu
+trafilaby wiec **ta** wersja: pelna kopia strony gabinetu z ich nazwa, adresem,
+telefonem i cennikiem 81 pozycji, ktorego nikt jeszcze nie potwierdzil, pod
+adresem, ktory do gabinetu nie nalezy. Klient mialby w wynikach wyszukiwania
+swoja "druga strone" z cenami, za ktore nie odpowiada.
+
+### Co zrobione
+
+Na wszystkich **16 stronach**, w `<head>` przed metatagiem `viewport`:
+
+```html
+<!-- ===== WERSJA DEMONSTRACYJNA - USUNAC PRZED URUCHOMIENIEM ===== -->
+<meta name="robots" content="noindex, nofollow"/>
+```
+
+Znacznik wstawiony takze do **obu generatorow** (`generator.js` dla szesciu
+artykulow, `buduj-cennik.js` dla dwoch cennikow). Bez tego pierwsze
+przegenerowanie skasowaloby go z osmiu stron po cichu - dokladnie ten blad
+zdarzyl sie juz w tym projekcie dwa razy. Przy okazji oba generatory **przeniesione
+do repo** (`tools/generatory/`, katalog wylaczony z deployu): wczesniej byly
+tylko w tymczasowym katalogu roboczym, wiec instrukcja "popraw generator" nie
+miala do czego sie odniesc, a osiem stron nie mialo w repo swojego zrodla.
+Sciezka do repo wyliczana jest teraz ze `__dirname`, nie zaszyta na sztywno.
+Sprawdzone: uruchomione z nowej lokalizacji odtwarzaja wszystkie osiem plikow
+bit w bit. Po dopisaniu przegenerowano pliki
+i sprawdzono diffem, ze zmiana to **dokladnie +2 linie na plik i nic wiecej**;
+zadna wczesniejsza reczna poprawka nie zostala cofnieta.
+
+### Dlaczego meta, a nie Disallow w robots.txt
+
+To nie jest to samo narzedzie. `Disallow` blokuje **pobranie** strony, wiec
+robot nigdy nie przeczyta dyrektywy `noindex` w srodku - a sam adres i tak
+moze trafic do wynikow, jesli ktos go gdziekolwiek podlinkuje (Google pokazuje
+wtedy goly URL bez opisu). Zeby zakaz indeksowania zadzialal, robot **musi
+wejsc i go przeczytac**. Dlatego `robots.txt` zostaje z `Allow: /`, a blokada
+siedzi w `<meta name="robots">`.
+
+`nofollow` dolozone, zeby demo nie przekazywalo mocy linkow na zewnatrz.
+
+### Weryfikacja
+
+Nie grepem po zrodle, tylko **parserem przegladarki** - grep nie odrozni
+znacznika w `<head>` od takiego, ktory parser przeniosl do `<body>` (wtedy
+dyrektywa nie dziala):
+
+```
+robots widziany przez parser: 16 z 16, kazdy w <head>, tresc "noindex, nofollow"
+bledy JS na stronach:         brak
+```
+
+CSS nietkniety, wiec `?v=` **nie byl podbijany** - zostaje `?v=20260821m`.
+
+### Link dla klienta dziala bez zmian
+
+Znacznik dotyczy wylacznie robotow wyszukiwarek. Kazdy, kto dostanie adres,
+otwiera strone normalnie. To nie jest haslo ani blokada dostepu - gdyby demo
+mialo byc naprawde niedostepne dla postronnych, trzeba by innego mechanizmu
+(repozytorium prywatne plus hosting z autoryzacja).
+
+### LISTA KONTROLNA NA DZIEN URUCHOMIENIA
+
+1. Usunac `<meta name="robots" content="noindex, nofollow"/>` wraz z komentarzem
+   ze wszystkich stron. Wszystkie wystapienia znajdziesz jednym poleceniem:
+   `grep -rn "USUNAC PRZED URUCHOMIENIEM" .`
+2. Usunac ten sam blok z `tools/generatory/generator.js` i
+   `tools/generatory/buduj-cennik.js` - inaczej wroci przy najblizszym
+   przegenerowaniu.
+3. Sprawdzic, czy adresy z `canonical` i z `sitemap.xml` faktycznie istnieja na
+   docelowej domenie (dzis wszystkie 15 wpisow sitemapy wskazuje na
+   amicodental.pl, gdzie tych plikow nie ma).
+4. Potwierdzic parserem, ze zapytanie o `meta[name="robots"]` zwraca `null` na
+   wszystkich stronach.
+5. Dopiero potem zglaszac witryne w Google Search Console.

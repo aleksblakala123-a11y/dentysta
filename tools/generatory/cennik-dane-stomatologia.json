@@ -1,0 +1,417 @@
+[
+ {
+  "kategoria": "Konsultacje, diagnostyka i stomatologia zachowawcza",
+  "pozycje": [
+   {
+    "nazwa": "Konsultacja",
+    "cena": "150 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Badanie stomatologiczne",
+    "cena": "100 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wizyta adaptacyjna",
+    "cena": "100 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Profesjonalna diagnoza ubytku próchnicowego za pomocą lasera \"Diagnodent\"",
+    "cena": "50 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wypełnienie w zębie stałym",
+    "cena": "300 - 450 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wypełnienie w zębie mlecznym",
+    "cena": "250 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Bonding",
+    "cena": "600 - 700 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Leczenie \"gazem rozweselającym\" - 250 zł + koszt wypełnienia",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Maseczka do podawania \"gazu rozweselającego\" ( jednorazowa opłata)",
+    "cena": "40 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Leczenie \"bezwiertłowe\" - 180 zł + koszt wypełnienia",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Rekonstrukcja zęba na włóknie szklanym",
+    "cena": "550 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Znieczulenie",
+    "cena": "50 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Bezbolesne znieczulenie komputerowe \"WAND\"",
+    "cena": "70 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Zamykanie diastemy materiałem światłoutwardzalnym",
+    "cena": "370 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Leczenie kanałowe (endodoncja)",
+  "pozycje": [
+   {
+    "nazwa": "Wypełnienie 1 kanału",
+    "cena": "1400 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wypełnienie 2 kanałów",
+    "cena": "1500 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wypełnienie 3 kanałów",
+    "cena": "1600 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wypełnienie każdego kolejnego kanału",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Ponowne leczenie kanałowe",
+    "cena": "1600 - 1800 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Udrożnienie jednego kanału pod mikroskopem",
+    "cena": "380 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Usunięcie narzędzia kanałowego pod mikroskopem",
+    "cena": "400 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Opatrunek tymczasowy",
+    "cena": "200 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Diagnostyka obrazowa (RTG)",
+  "pozycje": [
+   {
+    "nazwa": "RVG cyfrowe (zdjęcie pojedynczego zęba)",
+    "cena": "50 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Zdjęcie pantomograficzne",
+    "cena": "150 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Profilaktyka",
+  "pozycje": [
+   {
+    "nazwa": "Lakierowanie wszystkich zębów mlecznych / stałych",
+    "cena": "150 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Lapisowanie zębów",
+    "cena": "100 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Lakowanie bruzd",
+    "cena": "200 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Wybielanie",
+  "pozycje": [
+   {
+    "nazwa": "Wybielanie nakładkowe",
+    "cena": "1200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wybielanie gabinetowe",
+    "cena": "1000 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wybielanie endo - 200 / druga i kolejna wizyta - 180 zł",
+    "cena": null,
+    "calosc": true
+   }
+  ]
+ },
+ {
+  "kategoria": "Higienizacja",
+  "pozycje": [
+   {
+    "nazwa": "Piaskowanie zębów",
+    "cena": "280 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Usunięcie kamienia nazębnego (skaling)",
+    "cena": "280 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Skaling + piaskowanie",
+    "cena": "400 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Skaling + piaskowanie + fluoryzacja",
+    "cena": "450 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Laseroterapia, ozonoterapia i periodontologia",
+  "pozycje": [
+   {
+    "nazwa": "Laseroterapia (1 zabieg)",
+    "cena": "50 - 150 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Ozonoterapia (1 zabieg)",
+    "cena": "100 - 150 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Płukanie kieszonki z aplikacją leku",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Szynowanie zębów włóknem szklanym (1 ząb)",
+    "cena": "150 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Znoszenie nadwrażliwości",
+    "cena": "150 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Protetyka",
+  "pozycje": [
+   {
+    "nazwa": "Korona kompozytowa",
+    "cena": "800 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Korona pełnoceramiczna",
+    "cena": "2200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Korona porcelanowa na metalu - 1500 zł/ + skan 150 zł",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Licówka kompozytowa",
+    "cena": "600 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Licówka pełnoceramiczna",
+    "cena": "2200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Proteza częściowa",
+    "cena": "1600 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Proteza szkieletowa",
+    "cena": "3000 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wkład lub nakład porcelanowy - 2000 zł/ + skan - 150 zł",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Naprawa protezy (1 punkt)",
+    "cena": "450 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Zacementowanie rozcementowanej obcej korony, mostu",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Inlay, onlay, overlay kompozytowy - 950 zł / + skan- 150 zł",
+    "cena": null,
+    "calosc": true
+   },
+   {
+    "nazwa": "Korona na implancie",
+    "cena": "2800 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Chirurgia stomatologiczna i implantologia",
+  "pozycje": [
+   {
+    "nazwa": "Usunięcie zęba \"mądrości\"",
+    "cena": "400 - 800 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Usunięcie zęba mlecznego(cena ze znieczuleniem)",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Usunięcie zęba stałego(cena ze znieczuleniem)",
+    "cena": "200 - 400 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Nacięcie ropnia wewnątrzustnego",
+    "cena": "250 - 300 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wycięcie kieszonki dziąsłowej przy utrudnionym wyżynaniu zęba",
+    "cena": "150 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Resekcja zęba jednokorzeniowego",
+    "cena": "500 - 600 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wyłuszczenie torbieli",
+    "cena": "400 - 600 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Zabieg wszczepiania biomateriału",
+    "cena": "1500 - 3000 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Kiretaż zamknięty",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Kiretaż otwarty",
+    "cena": "400 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Podcięcie wędzidełka wargi lub języka",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Plastyka wyrostka zębodołowego",
+    "cena": "300 - 500 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wszczepienie implantu",
+    "cena": "2800 zł",
+    "calosc": false
+   }
+  ]
+ },
+ {
+  "kategoria": "Ortodoncja",
+  "pozycje": [
+   {
+    "nazwa": "Konsultacja ortodontyczna",
+    "cena": "180 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Aparat stały (1 łuk)",
+    "cena": "2600 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Aparat stały kosmetyczny (1 łuk)",
+    "cena": "3000 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wizyta kontrolna (1 łuk)",
+    "cena": "200 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wizyta kontrolna (2 łuki)",
+    "cena": "220 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Aparat retencyjny",
+    "cena": "550 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Aparat płytowy",
+    "cena": "800 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Aparat blokowy",
+    "cena": "1000 zł",
+    "calosc": false
+   },
+   {
+    "nazwa": "Wizyta kontrolna (aparat zdejmowany)",
+    "cena": "120 zł",
+    "calosc": false
+   }
+  ]
+ }
+]

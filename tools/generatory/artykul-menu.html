@@ -1,0 +1,88 @@
+<script>
+/* Menu mobilne bez webflow.js.
+   Strona artykulu nie laduje jQuery ani Webflow (to razem ~179 KB po gzipie
+   na stronie, ktora jest samym tekstem), a menu obslugiwal wlasnie webflow.js.
+   Ten skrypt odtwarza DOKLADNIE te zmiany w DOM, na ktorych opiera sie CSS,
+   i nic ponadto:
+
+     - `.w--open` na przycisku  -> blokada przewijania tla (`html:has(...)`),
+                                   stan hamburgera, hak dla pulapki fokusu;
+     - `.w-nav-overlay` w srodku `.navbar_wrap` -> warstwa panelu;
+     - `data-nav-menu-open` na `<nav>` -> `display:block !important` i pozycja.
+
+   Czego NIE odtwarzamy i dlaczego dobrze:
+   webflow.js przechwytywal linki-kotwice (`preventDefault` + wlasne przewijanie)
+   i przez to gubil natywne przeniesienie fokusu - stad na pozostalych stronach
+   osobna lata na skip link. Tutaj kotwice (skip link, spis tresci) dzialaja
+   natywnie, razem z przeniesieniem fokusu na `<main tabindex="-1">`.
+
+   Wysokosc overlayu ustawia CSS. Webflow wpisywal tu inline wysokosc calego
+   dokumentu, co przy pasku `position:fixed` rozciagalo warstwe daleko pod ekran
+   i wymagalo `!important` w arkuszu. My po prostu tego nie wpisujemy. */
+(function () {
+  var nav = document.querySelector('.navbar_wrap');
+  var przycisk = document.querySelector('.navbar-toggler-button');
+  var menu = document.getElementById('navbar-menu');
+  if (!nav || !przycisk || !menu) return;
+
+  /* Zapamietane miejsce panelu w DOM. Przy zamykaniu wraca dokladnie tam,
+     skad go zabralismy - inaczej po kilku otwarciach kolejnosc elementow
+     w pasku zaczelaby sie rozjezdzac. */
+  var rodzic = menu.parentNode;
+  var nastepny = menu.nextSibling;
+  var overlay = null;
+
+  function otwarte() { return przycisk.classList.contains('w--open'); }
+
+  function otworz() {
+    if (otwarte()) return;
+    overlay = document.createElement('div');
+    overlay.className = 'w-nav-overlay';
+    overlay.setAttribute('data-wf-ignore', '');
+    overlay.style.display = 'block';
+    nav.appendChild(overlay);
+    overlay.appendChild(menu);
+    menu.setAttribute('data-nav-menu-open', '');
+    przycisk.classList.add('w--open');
+    przycisk.setAttribute('aria-expanded', 'true');
+    przycisk.setAttribute('aria-label', 'Zamknij menu');
+  }
+
+  function zamknij(wrocFokusem) {
+    if (!otwarte()) return;
+    menu.removeAttribute('data-nav-menu-open');
+    rodzic.insertBefore(menu, nastepny);
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    overlay = null;
+    przycisk.classList.remove('w--open');
+    przycisk.setAttribute('aria-expanded', 'false');
+    przycisk.setAttribute('aria-label', 'Otwórz menu');
+    if (wrocFokusem) przycisk.focus();
+  }
+
+  przycisk.addEventListener('click', function () {
+    if (otwarte()) zamknij(false); else otworz();
+  });
+
+  // Klikniecie w link zamyka panel - inaczej po powrocie z kotwicy zostalby otwarty.
+  menu.addEventListener('click', function (e) {
+    if (e.target.closest('a')) zamknij(false);
+  });
+
+  /* Escape z fokusem W PASKU. Przypadek "fokus poza nawigacja" domyka juz
+     skrypt pulapki fokusu wyzej (wola przycisk.click()), wiec tutaj go
+     pomijamy - inaczej menu przelaczyloby sie dwa razy i zostalo otwarte. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !otwarte()) return;
+    if (!document.activeElement || !document.activeElement.closest('.navbar_wrap')) return;
+    zamknij(true);
+  });
+
+  /* Po przejsciu na szerokosc desktopowa hamburger znika. Gdyby panel zostal
+     otwarty, `html { overflow: hidden }` zablokowaloby przewijanie calej
+     strony bez zadnego widocznego powodu. */
+  window.addEventListener('resize', function () {
+    if (otwarte() && window.innerWidth > 991) zamknij(false);
+  });
+})();
+</script>
