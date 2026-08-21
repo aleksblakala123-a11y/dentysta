@@ -190,9 +190,27 @@ w CSS, bo w samym HTML tego nie ma.
    obraz swojego kafla i alt przepisany z `blog.html`, wiec klikniecie kafla prowadzi na
    strone z tym samym zdjeciem.
 
-   **TODO: CLIENT CONFIRMATION** - podpis autora (konkretny lekarz z tytulem czy "Zespol
-   Amico Dental") i data publikacji, na wszystkich szesciu wpisach naraz. Dotyczy tresci
-   widocznej i pola `author` w danych strukturalnych.
+   **DATY PUBLIKACJI - USTALONE 2026-08-21: zostaja takie, jakie sa.** Wszystkie szesc
+   wpisow powstalo i trafilo na produkcje tego samego dnia, wiec `datePublished` mowi
+   prawde. Rozwazane bylo rozlozenie dat wstecz, zeby blog wygladal na prowadzony od
+   miesiecy - odrzucone swiadomie: `datePublished` to deklaracja faktu dla wyszukiwarek,
+   a te daty byłyby nieprawdziwe. Kolejne wpisy dostana swoje realne daty i historia
+   zrobi sie sama.
+
+   **TODO: CLIENT CONFIRMATION - podpis autora.** Do potwierdzenia, czy wpisy podpisuje
+   konkretny lekarz (imie, nazwisko, tytul zawodowy), czy zbiorczo "Zespol Amico Dental".
+   Dotyczy tresci widocznej i pola `author` w danych strukturalnych, na wszystkich szesciu
+   wpisach naraz. Po decyzji: jedna zmiana w generatorze i przegenerowanie kompletu.
+   Komentarz `TODO` w plikach HTML nadal wymienia takze date - zostanie poprawiony przy
+   tej samej okazji, zeby nie robic commita na sam komentarz.
+
+   **WAZNIEJSZE NIZ PODPIS: tresc nie byla czytana przez nikogo z gabinetu.** Szesc
+   artykulow o tematyce zdrowotnej jest na produkcji firmowanych nazwiskiem praktyki.
+   Napisane sa na ogolnej, sprawdzonej wiedzy, bez obietnic efektu i bez informacji
+   o gabinecie spoza tych, ktore juz byly w serwisie - ale zalecenie kliniczne pod
+   szyldem praktyki stomatologicznej powinno przejsc przez osobe z uprawnieniami.
+   Najbardziej dotyczy to wpisu o wybielaniu oraz fragmentow o zebach mlecznych
+   w "Mitach o zebach". Do zrobienia niezaleznie od tego, jaki podpis zostanie wybrany.
 
    **Jak dodac siodmy wpis:** dopisac obiekt do tablicy `WPISY` w generatorze, dorzucic
    `tresc/<slug>.html` z sekcjami, uruchomic generator, potem skrypt podpinajacy linki
