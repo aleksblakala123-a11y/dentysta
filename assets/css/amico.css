@@ -5890,3 +5890,111 @@ button.navbar-toggler-button {
      Webflow i przycisk mialby 16 px zamiast 24 px jak na pozostalych stronach.
      Rodzina fontu i tak jest dziedziczona z `.navbar-toggler-button`. */
 }
+
+/* ===== Cennik =====
+   Strona cennika korzysta z ukladu artykulu (`.article-page` + `.article-head`
+   + `.article-body`), zeby nie dublowac typografii i naglowka - dochodzi tylko
+   to, czego artykul nie ma: wiersz "usluga / cena".
+
+   Wiersz jest flexem, a nie tabela, bo przy 81 pozycjach i dlugich nazwach
+   tabela wymuszalaby poziome przewijanie na telefonie. Nazwa zawija sie
+   swobodnie, cena ma `white-space: nowrap` i nigdy sie nie lamie.
+
+   Czesc pozycji w zrodle laczy kilka cen w jednym zdaniu ("twarz- 900 zł;
+   twarz+szyja- 1100 zł"). Takich nie rozdzielamy na sile - dostaja klase
+   `is-caly` i ida jednym blokiem, bo lepiej pokazac surowy zapis niz zgadywac,
+   ktora kwota jest ta glowna. ===== */
+
+.cennik-lista {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.cennik-pozycja {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 20px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--primitive-color--neutral-300);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.cennik-pozycja:last-child { border-bottom: 0; }
+
+.cennik-usluga {
+  flex: 1 1 auto;
+  color: var(--primitive-color--gray-600);
+}
+
+.cennik-cena {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--primitive-color--primary-900);
+}
+
+/* Pozycja z kilkoma cenami w jednym zdaniu - bez podzialu na kolumny. */
+.cennik-pozycja.is-caly {
+  display: block;
+  color: var(--primitive-color--gray-600);
+}
+
+/* Kategorie sa krotsze niz sekcje artykulu, wiec odstep nad naglowkiem
+   moze byc mniejszy - inaczej strona rozjezdza sie na kilometry. */
+.cennik-page .article-body h2 { margin-top: 40px; }
+.cennik-page .article-body section:first-child h2 { margin-top: 16px; }
+
+/* Spis kategorii ma 11 pozycji - w dwoch kolumnach czyta sie go jednym rzutem
+   oka zamiast przewijac. Ponizej 560 px wraca do jednej kolumny. */
+@media screen and (min-width: 560px) {
+  .cennik-page .article-toc ol {
+    columns: 2;
+    column-gap: 28px;
+  }
+
+  .cennik-page .article-toc li {
+    break-inside: avoid;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .cennik-pozycja { font-size: 16px; }
+}
+
+/* Przelacznik miedzy cennikiem stomatologicznym a estetycznym.
+   Medycyna estetyczna ma osobna strone - nie ma jej w pasku nawigacji, zeby
+   nie rozmywac profilu gabinetu, wiec jedyne przejscie miedzy nimi prowadzi
+   przez ten link. Stad wyrozniony blok, a nie zwykly odnosnik w tekscie. */
+
+.cennik-przelacznik {
+  margin: 32px 0 0;
+  padding: 16px 20px;
+  border: 1px solid var(--primitive-color--neutral-300);
+  border-radius: 12px;
+  background-color: var(--primitive-color--neutral-100);
+  font-size: 17px;
+}
+
+.cennik-przelacznik a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--primitive-color--primary-700);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Link telefoniczny w ramce "Zanim zajrzysz do cennika" mierzyl 21 px wysokosci.
+   Formalnie WCAG 2.2 (2.5.8) wylacza spod wymogu 24 px linki w zdaniu, wiec
+   przepis tego nie lapie - ale to jest numer telefonu na stronie gabinetu
+   stomatologicznego, czyli najcenniejsze dotkniecie na calej stronie. Traktujemy
+   go jak przycisk, nie jak odnosnik w tekscie. */
+
+.article-summary a {
+  display: inline-block;
+  padding-block: 4px;
+}

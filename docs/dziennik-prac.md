@@ -561,3 +561,98 @@ tresc ma byc wyraznie ciemniejsza niz reszta serwisu.
 **Wniosek ogolny, ten sam co przy skrocie `margin` i przy tle `<button>`:
 "czyszczenie martwego kodu" trzeba zmierzyc jak kazda inna zmiane.** Trzeci raz
 tego samego dnia deklaracja wygladajaca na nieaktywna okazala sie dzialac.
+---
+
+## 8. Cennik (2026-08-21)
+
+Nowe strony: `cennik.html` (10 kategorii, 73 pozycje) i `cennik-medycyna-estetyczna.html`
+(8 pozycji). "Cennik" doszedl do paska nawigacji na wszystkich 11 stronach, miedzy
+"Uslugi" a "Blog".
+
+### Zrodlo i sposob przepisania
+
+Ceny pochodza ze starej strony gabinetu:
+`http://www.amicodental.pl/cennik-dentysta-swidnik.html`. Pobrane curlem jako surowy
+HTML i sparsowane programowo (`cennik-przepisz.js`) - **zero przepisywania recznie**,
+zeby nie dalo sie przekrecic kwoty.
+
+Kontrola integralnosci po przepisaniu:
+
+    pozycji:  zrodlo 80 -> wyjscie 81   (roznica 1 = rozdzielona pozycja, patrz nizej)
+    liczb:    123 -> 123   ZBIORY IDENTYCZNE
+    slow:     277 -> 277   ZBIORY IDENTYCZNE
+
+Jedyna normalizacja: odstep przed "zl" (zrodlo ma raz `800 zł`, raz `800zł`).
+Cyfry nietkniete.
+
+### Trzy rzeczy wymagajace interpretacji - wszystkie do potwierdzenia przez gabinet
+
+**1. Zrodlo nie ma kategorii.** To jedna plaska lista `<ol>` z 80 pozycjami.
+Podzial na kategorie jest NASZ i wynika wylacznie z kolejnosci pozycji - nic nie
+zostalo przestawione, wstawione sa tylko naglowki w naturalnych granicach.
+Granice w generatorze wyznaczone sa po NAZWIE uslugi, a nie po numerze, wiec
+przesuniecie w zrodle wywali blad zamiast po cichu rozjechac podzial.
+
+**2. Jedna pozycja skleja dwie uslugi** - w zrodle brakuje znacznika zamykajacego:
+
+    Leczenie "bezwiertłowe" - 180zł + koszt wypełnienia Rekonstrukcja zęba na
+    włóknie szklanym - 550zł
+
+Rozdzielona na dwa wiersze. To jedyna ingerencja w tresc.
+
+**3. Jedenascie pozycji ma po kilka cen w jednym zdaniu** (np. `twarz- 900 zł;
+twarz+szyja- 1100 zł`). Tych NIE rozdzielamy na sile - dostaja klase `is-caly`
+i ida jednym blokiem, w surowym zapisie. Lepiej pokazac oryginal niz zgadywac,
+ktora kwota jest glowna. Parser ma na to dwa zabezpieczenia: jesli po odcieciu
+ceny w nazwie zostaje "zl" albo mysnik z liczba, pozycja idzie w calosci.
+
+### Dwie anomalie w zrodle - CELOWO NIEPOPRAWIONE
+
+- `Wybielanie endo - 200 / druga i kolejna wizyta - 180zł` - pierwsza kwota
+  nie ma jednostki.
+- `PRX -T33 twarz-300zł/ twarz+szyja- 400zł/ twarz+szyja+dekolt- 200zł` -
+  najszerszy zakres zabiegu jest TANSZY niz sama twarz. Wyglada na literowke,
+  ale poprawianie cudzych cen to nie nasza decyzja.
+
+### Decyzje
+
+**Medycyna estetyczna osobno.** Ustalone z klientem 2026-08-21. To inna kategoria
+uslug niz stomatologia, a stara strona gabinetu nie ma jej nawet w menu. Osobna
+strona, linkowana z cennika i z powrotem, poza paskiem nawigacji - zeby nie
+rozmywac profilu gabinetu.
+
+**Bez schematu `Offer` z cenami.** Strony maja `WebPage` + `BreadcrumbList` spiete
+z wezlem `Dentist`, ale cen NIE emitujemy jako danych maszynowych. `Offer` z `price`
+to deklaracja handlowa dla wyszukiwarki; ceny pochodza ze starej strony i moga byc
+nieaktualne. Ustalenie z klientem: publikujemy je jako tresc z zastrzezeniem,
+a poprawimy, gdy gabinet je zweryfikuje.
+
+**Strony cennika sa tekstowe, wiec nie laduja jQuery, Webflow ani GSAP** - dokladnie
+jak wpisy bloga. Menu obsluguje ten sam skrypt, hamburger jest natywnym `<button>`.
+
+### Weryfikacja
+
+Zakres zmian w stronach bazowych sprawdzony diffem: jedyne co doszlo to trzy linie
+pozycji "Cennik" w pasku i podbity `?v=`. Nic wiecej.
+
+Nowe selektory CSS (`.cennik-*`, `.cennik-page .article-*`) sprawdzone w przegladarce
+na wszystkich pozostalych stronach: **zero trafien**, wiec nie moga niczego ruszyc.
+
+Obie strony cennika na 320/390/768/1440: zero poziomego scrolla, zero bledow konsoli,
+jeden `<h1>`, hierarchia naglowkow bez przeskokow, wszystkie kotwice spisu kategorii
+istnieja, lewe krawedzie kolumny zgodne, kontrast - usluga 4,95:1, cena 17,19:1,
+link przelacznika 13,32:1. Detektor Impeccable: 11 znalezisk, wszystkie odziedziczone
+z szablonu (`extreme-negative-tracking`, `side-tab`, `gradient-text`), zero nowych,
+zero `low-contrast`.
+
+Szesc wpisow bloga przegenerowanych z nowym paskiem - sonda bez uwag, 10 linkow
+wewnetrznych na stronie zamiast 9.
+
+**Poprawka przy okazji:** link telefoniczny w ramce nad cennikiem mierzyl 21 px.
+Formalnie WCAG wylacza spod wymogu 24 px linki w zdaniu, ale to numer telefonu na
+stronie gabinetu - najcenniejsze dotkniecie na calej stronie. Traktujemy go jak
+przycisk, nie jak odnosnik w tekscie.
+
+**Falszywy alarm sondy, wart zapamietania:** przycisk hamburgera raportuje 18 px
+wysokosci, bo `getBoundingClientRect()` nie widzi pseudo-elementu `::after`, ktory
+powieksza obszar klikalny do 44x44 (patrz sekcja o menu mobilnym). To nie jest blad.
