@@ -131,26 +131,36 @@ w CSS, bo w samym HTML tego nie ma.
    tylko tekst pod przyciskiem, bylo to niescisle; po podpieciu `aria-describedby`
    staloby sie **opisem pola telefonu** czytanym przez czytnik ekranu. Teraz sa trzy
    warianty, dobierane do tego, czego faktycznie brakuje.
-4. **CSS wazy 175,5 KB** przy budzecie 60 KB. Partia 1 zdjela 16,6 KB (komponenty Webflow),
-   partia 2 kolejne **76,9 KB**: wlasne klasy szablonu, czyli strony, ktorych ten serwis
-   nie ma - `sales-page_*`, `utilities-*`, `job-*`, `awards-*`, `team-*`, `marquee_*`,
-   `legal-aside_*`. 425 regul, 244 klasy. Po gzipie 36,4 -> 29,8 KB.
+4. **CSS wazy 170,3 KB** przy budzecie 60 KB. Partia 1 zdjela 16,6 KB (komponenty Webflow),
+   partia 2 kolejne **76,9 KB** (wlasne klasy szablonu: strony, ktorych ten serwis nie ma -
+   `sales-page_*`, `utilities-*`, `job-*`, `awards-*`, `team-*`, `marquee_*`, `legal-aside_*`;
+   425 regul, 244 klasy), partia 3 jeszcze **5,2 KB** (nawigacja i rozwijane menu: 34 reguly,
+   18 klas). Lacznie 98,7 KB, z 269,0 do 170,3 KB. Po gzipie 38,6 -> 29,3 KB.
 
-   Zostalo **16,4 KB regul w calosci martwych** i nie jest to juz jeden duzy kes:
-   7,9 KB komponenty Webflow (`w-*`), 4,3 KB reguly zablokowane guardem, 4,0 KB odlozona
-   nawigacja, 0,2 KB chronione `w-mod-*`. Budzet 60 KB liczony po dysku jest dla tego
-   arkusza nieosiagalny - nawet po wycieciu wszystkiego martwego zostaje ~159 KB.
-   Sensownym celem jest gzip, bo to on leci po sieci.
+   Zostalo **11,3 KB regul w calosci martwych**: 6,8 KB komponenty Webflow (`w-*`),
+   4,3 KB reguly zablokowane guardem, 0,2 KB chronione `w-mod-*`. Kubelek nawigacji jest
+   pusty - partia 3 wziela z niego wszystko. Budzet 60 KB liczony po dysku jest dla tego
+   arkusza nieosiagalny: nawet po wycieciu wszystkiego martwego zostaje ~159 KB zywych
+   regul Webflow. Sensownym celem jest gzip, bo to on leci po sieci.
+
+   **Uwaga przy porownywaniu rozmiarow:** na dysku plik ma CRLF, a git normalizuje konce
+   linii do LF. Blob w repo i plik serwowany przez Pages sa wiec o tyle bajtow mniejsze,
+   ile plik ma linii (przy 170,3 KB to ok. 5,8 KB roznicy). To nie jest zaden ubytek tresci.
 
    **Guard "wszystkie klasy w regule martwe" zostaje**, mimo ze kosztuje 4,3 KB
    niewycietych regul typu `.martwa .zywa` (takie faktycznie nie maja szans dopasowania).
    To wlasnie ten guard obronil `.lead-form_status.is-info` - patrz akapit nizej.
    Tanszy blad to zostawic 4 KB niz wyciac dzialajaca regule.
 
-   **Nawigacja odlozona swiadomie:** `navbar-dropdown_*`, `navbar_dropdown`, `dropdown_*`
-   wygladaja rownie martwo co reszta, ale pasek to najdelikatniejszy element serwisu
-   (fixed, pulapka fokusu, menu mobilne). Idzie osobna partia, zeby przy ewentualnej
-   regresji bylo wiadomo, ktore ciecie ja spowodowalo.
+   **Partia 3 (nawigacja) - ZROBIONA 2026-08-21.** Wyciete: wlasne klasy podmenu
+   (`navbar-dropdown_*`, `navbar_dropdown`, `dropdown_*`), komponent dropdown Webflow
+   (`w-dropdown*`, `w-icon-dropdown-toggle`) oraz martwe czesci komponentu nawigacji
+   (`w-nav-link`, `w-icon-nav-menu` - serwis uzywa wlasnego `navbar_link` i wlasnych paskow
+   hamburgera). `w-slider-nav-invert` **nie** wchodzil do tej partii mimo "nav" w nazwie:
+   to nawigacja slidera, nie paska. Zywe klasy paska (`navbar_wrap`, `navbar_menu`,
+   `navbar_link`, `navbar-toggler-button`, `w-nav`, `w-nav-menu`, `w-nav-button`,
+   `w-nav-brand`, `w-nav-overlay`, `skip-link`) sa nietkniete - kosiarka ma twarda polise:
+   jesli po cieciu ktorakolwiek z nich znika z arkusza, plik w ogole nie zostaje zapisany.
 
    **Nie ruszac bez namyslu:** `w-mod-touch` wyglada na martwa, bo headless Chromium nie
    jest urzadzeniem dotykowym - a regula `html.w-mod-touch * { background-attachment:
@@ -224,3 +234,20 @@ NIEZMIENIONYM kodzie i porownaj go z poprzednim. Jesli te same roznice wychodza 
 samym CSS, wina jest po stronie harnessu. W partii 2: `stary3` vs `stary4` (ten sam stary
 CSS) = 0 roznic, `stary3` vs `nowy3` (przed vs po wycieciu 76,9 KB) = 0 roznic. Dopiero to
 jest dowod, a nie pojedynczy zielony przebieg.
+
+**Odciski mierza STANY, nie DZIALANIE.** Przy partii nawigacyjnej to za malo: odcisk pokaze,
+ze otwarte menu ma te sama geometrie, ale nie sprawdzi, czy klikniecie je otwiera, czy fokus
+jest uwieziony, czy Escape zamyka i czy link da sie kliknac, a nie jest przykryty. Stad
+osobna sonda (`nawigacja.js`): 4 strony x 2 szerokosci, a w kazdej kombinacji pasek
+w spoczynku i po przewinieciu, `elementFromPoint` na kazdym linku, otwarcie menu
+(geometria panelu, `aria-expanded`, `w--open`, `inert` na `<main>`), 12 x Tab z kontrola,
+czy fokus nie wyszedl poza nawigacje, Escape i skip link. Sonda tez dostaje pare kontrolna.
+
+Dwa artefakty tej sondy, warte zapamietania, bo oba wygladaly jak bledy strony:
+- **Fokus trzeba zresetowac przed testem skip linku.** Po zabawie z menu fokus zostaje na
+  hamburgerze, wiec kolejny Tab trafia w NASTEPNY element, a nie w pierwszy. Sonda
+  "wykrywala" brak skip linku przy 390 px, choc dzialal. Lek: przeladowanie strony
+  przed pomiarem, a nie samo przewiniecie na gore.
+- **Fokus na `<body>` po ostatnim elemencie nawigacji to NIE wyciek z pulapki**, tylko
+  udokumentowany stan domykany osobnym nasluchem. Wyciekiem byloby dopiero trafienie
+  w tresc pod `inert`.
