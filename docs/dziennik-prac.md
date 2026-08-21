@@ -131,19 +131,45 @@ w CSS, bo w samym HTML tego nie ma.
    tylko tekst pod przyciskiem, bylo to niescisle; po podpieciu `aria-describedby`
    staloby sie **opisem pola telefonu** czytanym przez czytnik ekranu. Teraz sa trzy
    warianty, dobierane do tego, czego faktycznie brakuje.
-4. **CSS wazy 252,4 KB** przy budzecie 60 KB. Partia 1 zdjela 16,6 KB (komponenty Webflow).
-   Analiza po strukturze pokazuje **107 KB w regulach w calosci martwych**, z czego
-   najwiekszy kes to **82,9 KB wlasnych klas projektu** (ekrany, ktorych ten serwis nie ma:
-   `utilities-*`, `sales-page_*` itp.). Kolejne partie: klasy wlasne, potem ostroznie
-   nawigacja i slider.
+4. **CSS wazy 175,5 KB** przy budzecie 60 KB. Partia 1 zdjela 16,6 KB (komponenty Webflow),
+   partia 2 kolejne **76,9 KB**: wlasne klasy szablonu, czyli strony, ktorych ten serwis
+   nie ma - `sales-page_*`, `utilities-*`, `job-*`, `awards-*`, `team-*`, `marquee_*`,
+   `legal-aside_*`. 425 regul, 244 klasy. Po gzipie 36,4 -> 29,8 KB.
+
+   Zostalo **16,4 KB regul w calosci martwych** i nie jest to juz jeden duzy kes:
+   7,9 KB komponenty Webflow (`w-*`), 4,3 KB reguly zablokowane guardem, 4,0 KB odlozona
+   nawigacja, 0,2 KB chronione `w-mod-*`. Budzet 60 KB liczony po dysku jest dla tego
+   arkusza nieosiagalny - nawet po wycieciu wszystkiego martwego zostaje ~159 KB.
+   Sensownym celem jest gzip, bo to on leci po sieci.
+
+   **Guard "wszystkie klasy w regule martwe" zostaje**, mimo ze kosztuje 4,3 KB
+   niewycietych regul typu `.martwa .zywa` (takie faktycznie nie maja szans dopasowania).
+   To wlasnie ten guard obronil `.lead-form_status.is-info` - patrz akapit nizej.
+   Tanszy blad to zostawic 4 KB niz wyciac dzialajaca regule.
+
+   **Nawigacja odlozona swiadomie:** `navbar-dropdown_*`, `navbar_dropdown`, `dropdown_*`
+   wygladaja rownie martwo co reszta, ale pasek to najdelikatniejszy element serwisu
+   (fixed, pulapka fokusu, menu mobilne). Idzie osobna partia, zeby przy ewentualnej
+   regresji bylo wiadomo, ktore ciecie ja spowodowalo.
 
    **Nie ruszac bez namyslu:** `w-mod-touch` wyglada na martwa, bo headless Chromium nie
    jest urzadzeniem dotykowym - a regula `html.w-mod-touch * { background-attachment:
    scroll !important }` to realna poprawka pod iOS. Tak samo `w-mod-js/ix/ix3` i klasy CMS.
 
-   **Szum zrzutow ekranu:** 3 z 80 zrzutow (zdjecia `story-images` na `about.html`, animowane
-   przez GSAP) roznia sie miedzy przebiegami przy IDENTYCZNYM CSS. Odciski stylow i geometrii
-   sa stabilne - to one sa rozstrzygajace, nie piksele.
+   **`is-info` - druga pulapka tego samego rodzaju, znaleziona w partii 2.** Inwentarz
+   uznal ta klase za martwa, bo runtime jej nie widzi. `index.html` sklada nazwe
+   dynamicznie: `className = 'lead-form_status' + (type ? ' is-' + type : '')`, a
+   `type='info'` pojawia sie dopiero w trakcie wysylki formularza - stanu, do ktorego
+   przebieg inwentarza nigdy nie dochodzi (walidacja konczy sie wczesniej, backendu nie
+   ma). Regula `.lead-form_status.is-info` jest nasza i dziala.
+   **Wniosek: przy skanowaniu inline JS nie wystarcza literaly `classList.add('x')` -
+   trzeba szukac tez nazw SKLADANYCH ze stringow.**
+
+   **Sprostowanie do "szumu zrzutow ekranu" z poprzedniej wersji tego punktu.** Bylo
+   napisane, ze szumia piksele, a odciski stylow i geometrii sa stabilne i to one
+   rozstrzygaja. Nieprawda: odciski tez potrafily. Pierwsze porownanie partii 2 pokazalo
+   256 roznic na `index_320` - a te same 256 roznic wyszlo miedzy dwoma przebiegami na
+   NIEZMIENIONYM CSS. Blad byl w harnessie, nie na stronie; opis i poprawka w sekcji 6.
 5. ~~**Dane strukturalne (`Dentist`) tylko na `index.html`.**~~ **ZROBIONE 2026-08-21.**
    Sprostowanie: ten wpis byl niescisly - `service.html` mial `Dentist` (plus `FAQPage`)
    juz wczesniej. Brakowalo na `about.html` i `blog.html`; obie strony maja go teraz,
@@ -178,3 +204,23 @@ Pomiary rob w Playwrighcie (renderuje naprawde), nie w schowanym panelu.
 
 Uwaga na artefakty testowe: `locator.click()` w Playwright sam przewija element do widoku -
 przy pasku nawigacji na `position:absolute` zeruje to `scrollY` i wyglada jak blad strony.
+
+**Krok przewijania przy stabilizacji MUSI byc mniejszy niz okno.** Harness odciskow szedl
+skokiem `scrollHeight/10`. Na najdluzszej stronie (`index` @320 px, ~12 900 px) to skok
+~1290 px przy oknie 900 px - czesc elementow nigdy nie trafiala do viewportu, ich reveal
+(IntersectionObserver + ScrollTrigger) nie ruszal i zostawaly na `opacity:0`. Efekt byl
+**bistabilny**: ten sam, niezmieniony CSS dawal raz komplet reveali, raz 28 elementow
+nieodslonietych - czyli 256 roznic w porownaniu, wszystkie na `index_320`, wszystkie na
+`opacity`/`transform` i wynikajacych z nich przesunieciach. Wyglada to dokladnie jak
+regresja po wycieciu CSS.
+
+Poprawka: krok = pol wysokosci okna, wysokosc dokumentu czytana w kazdej iteracji (strona
+rosnie w miare odslaniania), na koncu zjazd na sam dol i powrot na gore. Do indeksu doszedl
+licznik elementow z `opacity < 0.99`; jego rozjazd miedzy przebiegami zdradza niestabilnosc
+POMIARU, zanim zdazysz obwinic CSS.
+
+**Jak rozstrzygac takie przypadki:** nie zgaduj, czy to szum. Zrob przebieg kontrolny na
+NIEZMIENIONYM kodzie i porownaj go z poprzednim. Jesli te same roznice wychodza przy tym
+samym CSS, wina jest po stronie harnessu. W partii 2: `stary3` vs `stary4` (ten sam stary
+CSS) = 0 roznic, `stary3` vs `nowy3` (przed vs po wycieciu 76,9 KB) = 0 roznic. Dopiero to
+jest dowod, a nie pojedynczy zielony przebieg.
