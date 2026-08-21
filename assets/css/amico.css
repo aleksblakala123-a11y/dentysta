@@ -5603,11 +5603,27 @@ html {
 
 /* --- tresc --- */
 
+/* Kolor tekstu tresci ustawiany JAWNIE na elementach, nie przez dziedziczenie.
+   BYLO: `.article-body { color: #333 }`. Ta deklaracja dla akapitow byla martwa,
+   bo Webflow ma globalna regule `p { color: var(--primitive-color--gray-600) }`,
+   a wartosc DZIEDZICZONA zawsze przegrywa z regula trafiajaca w element
+   bezposrednio - niezaleznie od specyficznosci. Skutek: akapity renderowaly sie
+   jako #707070, a listy i komorki tabel jako #333, czyli tresc miala dwa rozne
+   kolory tekstu obok siebie. Zmierzone na produkcji, nie wydedukowane.
+   Teraz jeden token na wszystkie elementy tekstowe tresci. Naglowki tabeli
+   zostaja ciemne - `.article-table thead th` ma wyzsza specyficznosc. */
+
 .article-body {
   padding-top: 8px;
   font-size: 18px;
   line-height: 1.7;
-  color: #333;
+}
+
+.article-body p,
+.article-body li,
+.article-body td,
+.article-body th {
+  color: var(--primitive-color--gray-600);
 }
 
 .article-body h2 {

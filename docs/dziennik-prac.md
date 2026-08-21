@@ -483,3 +483,81 @@ plikach HTML, JS i CSS, a pliki nie maja front mattera - Jekyll kopiuje je bez z
 **Uwaga na przyszlosc:** od teraz deploy przechodzi przez build Jekylla. Jesli build
 padnie, strona przestanie sie aktualizowac przy zielonym pushu. Po kazdej zmianie
 struktury plikow warto sprawdzic kod odpowiedzi na live, a nie tylko `git push`.
+### Detektor wyprowadzony z trybu DEGRADED (2026-08-21)
+
+Doinstalowane cztery paczki parserow do `.claude/skills/impeccable/node_modules`
+(`htmlparser2`, `css-select`, `domutils`, `css-tree` - razem 13 paczek, 5,1 MB).
+Katalog jest w `.gitignore`, wiec nie wchodzi do repo ani do deployu.
+
+Roznica jest drastyczna. W trybie DEGRADED detektor zglaszal **0 znalezisk**
+i szescienie advisory o myslnikach. W pelnym trybie:
+
+| zakres | znalezisk | glowne reguly |
+|---|---|---|
+| `blog/` | 97 | 73 extreme-negative-tracking, 6 side-tab, 6 flat-type-hierarchy, 6 gradient-text |
+| `index.html` | 16 | 4 gradient-text, 3 low-contrast, 3 clipped-overflow-container, 2 cramped-padding |
+| `about.html` | 13 | 5 gradient-text, 5 extreme-negative-tracking, 2 clipped-overflow-container |
+| `service.html` | 13 | 7 extreme-negative-tracking, 3 gradient-text, 2 clipped-overflow-container |
+
+**To jest backlog na nastepna iteracje, nie lista bledow do natychmiastowej
+naprawy.** Wiekszosc to wzorce odziedziczone z szablonu Webflow (gradient w tekscie,
+gruby akcent na krawedzi karty, ciasne swiatlo miedzy literami w naglowkach),
+a nie rzeczy, ktore napisalismy sami.
+
+`extreme-negative-tracking` z 73 trafieniami na blogu to jedna przyczyna: naglowki
+dziedzicza z szablonu `letter-spacing` do -0.13em. Nasze reguly `.article-body h2/h3`
+nie ustawiaja swiatla wcale, wiec przechodzi wartosc Webflow. Poprawka byloby jedna
+linijka, ale dotknelaby wszystkich naglowkow w serwisie - stad do osobnej iteracji.
+
+### Jak czytac znaleziska `low-contrast` - trzy z czterech byly artefaktami
+
+Detektor liczy kaskade STATYCZNIE, wiec potrafi sparowac kolor tekstu z tlem, ktore
+nigdy razem nie wystepuje. Kazde znalezisko przeszlo weryfikacje w przegladarce:
+
+- **linki paska nawigacji, rzekomo 1,08:1** - artefakt. Pasek jest przezroczysty,
+  a pod nim lezy hero z **gradientem**. Ani przejscie po przodkach, ani
+  `elementsFromPoint` tego nie widza, bo oba czytaja `backgroundColor`, a gradient
+  siedzi w `background-image`. Zrzut ekranu rozstrzygnal w sekunde: linki sa czytelne
+  na ciemnym gradiencie. To ten sam prog, o ktorym mowi sekcja 6 - **gdy tlem jest
+  obraz albo gradient, kontrast liczy sie z pikseli, nie z wartosci CSS**.
+- **`.text-highlighted` na `about.html`, rzekomo 1,21:1** - artefakt tego samego
+  rodzaju. Element ma gradient w tle (prawdopodobnie `background-clip: text`, co
+  zreszta zapala u Impeccable regule `gradient-text`).
+- **akapit FAQ na `#c8c8c8`, 2,96:1 przy 390 px** - **kandydat na realny blad,
+  niedokonczona weryfikacja.** Rodzic `a.faq_item` ma nieprzezroczyste tlo
+  `rgb(200, 200, 200)` - to domyslne tlo aktywnej zakladki Webflow
+  (`.w-tab-link.w--current`). Tekst odpowiedzi `#707070` na tym tle daje 2,96:1
+  przy progu 4,5. Zrzut zlapal element w trakcie animacji rozwijania, wiec stanu
+  spoczynkowego NIE potwierdzono. Do sprawdzenia na poczatku nastepnej iteracji:
+  otworzyc pozycje FAQ, odczekac na koniec animacji, zmierzyc ponownie.
+  Dotyczy `index.html` i `blog.html` przy 390 px.
+
+### Sprzatanie martwego `#333` okazalo sie zmiana wizualna
+
+Zadanie brzmialo "wyczysc martwe `#333` w `.article-body`" i wygladalo na kosmetyke.
+Pomiar przed i po (6 podstron x 4 szerokosci, 19 026 elementow) pokazal co innego:
+**10 263 roznice w stylach, zero w geometrii**. Po odsianiu elementow, ktore nie
+renderuja tekstu, zostaje obraz rzeczywisty:
+
+| element | bylo | jest |
+|---|---|---|
+| `td` (1254 trafienia) | #333333, 12,63:1 | #707070, 4,95:1 |
+| `li` (550) | #333333, 12,63:1 | #707070, 4,95:1 |
+| `strong` (484) | #333333, 12,63:1 | #707070, 4,95:1 |
+| `p` (66) | #6e7677, 4,65:1 | #707070, 4,95:1 |
+
+Czyli `#333` wcale nie bylo martwe - bylo martwe TYLKO dla akapitow (bo globalna
+regula `p` Webflow bije dziedziczenie), a listy, komorki tabel i pogrubienia
+faktycznie z niego korzystaly. Tresc miala dwa rozne kolory tekstu obok siebie
+i nikt tego nie zauwazyl.
+
+Wybrany wariant: **jeden token `gray-600` na wszystkie elementy tekstowe tresci**.
+Artykul czyta sie jak jeden glos, kolor zgadza sie z reszta serwisu, wszystko
+powyzej AA. Cena: listy, tabele i pogrubienia sa jasniejsze niz byly.
+Alternatywy, gdyby decyzja miala byc inna - obie to jedna linijka:
+`gray-800` (#646464, 5,8:1) jako kompromis albo `primary-900` (17,19:1), jesli
+tresc ma byc wyraznie ciemniejsza niz reszta serwisu.
+
+**Wniosek ogolny, ten sam co przy skrocie `margin` i przy tle `<button>`:
+"czyszczenie martwego kodu" trzeba zmierzyc jak kazda inna zmiane.** Trzeci raz
+tego samego dnia deklaracja wygladajaca na nieaktywna okazala sie dzialac.
