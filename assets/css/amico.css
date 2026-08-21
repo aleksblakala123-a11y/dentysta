@@ -5435,3 +5435,434 @@ html {
   outline: 2px solid #c0392b;
   outline-offset: 2px;
 }
+
+/* ===== Artykul bloga =====
+   Wzorzec podstrony wpisu (blog/*.html). Zadna z klas szablonu Webflow do
+   artykulow nie przetrwala odchudzania - i dobrze, bo `rich-text_blog`
+   i `blog-details_*` niosly uklad zupelnie innej strony. Zamiast je wskrzeszac,
+   ponizej jest wlasny, maly zestaw regul na istniejacych tokenach.
+
+   DLACZEGO NAGLOWEK ARTYKULU MA CIEMNE TLO
+   `.navbar_wrap` jest przezroczysty do pierwszego przewiniecia, a linki maja
+   kolor #f3f6ff i logo w wariancie jasnym - pasek jest projektowany pod ciemne
+   hero. Na bialej stronie artykulu nawigacja bylaby bialym tekstem na bialym
+   tle az do pierwszego przewiniecia. Ciemny pas naglowka rozwiazuje to bez
+   zadnego wyjatku w regulach paska i zgadza sie z reszta serwisu.
+
+   MIARA WIERSZA
+   Szerokosc kolumny liczymy jako `min(100% - 2*margines, 760px)`. 760 px przy
+   18 px foncie daje okolo 70 znakow w wierszu. Ten jeden wzor obsluguje i tekst,
+   i ramki z tlem - bez `padding-inline` na elemencie, ktory ma wlasne tlo
+   (tam kolor konczylby sie razem z tekstem, a nie na krawedzi ramki). ===== */
+
+.article-page {
+  --article-measure: 760px;
+  --article-gutter: 24px;
+  background-color: var(--primitive-color--neutral-0);
+}
+
+.article-head > *,
+.article-figure,
+.article-summary,
+.article-toc,
+.article-body,
+.article-cta,
+.article-related {
+  width: min(100% - 2 * var(--article-gutter), var(--article-measure));
+  margin-inline: auto;
+}
+
+/* --- naglowek na ciemnym pasie --- */
+
+.article-head {
+  background-color: var(--primitive-color--primary-900);
+  color: var(--primitive-color--neutral-0);
+  padding-top: calc(var(--navbar-h, 69px) + 40px);
+  padding-bottom: 48px;
+}
+
+.article-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--primitive-color--neutral-200);
+}
+
+.article-breadcrumb li + li::before {
+  content: "/";
+  margin-right: 10px;
+  opacity: .6;
+}
+
+.article-breadcrumb a {
+  color: var(--primitive-color--neutral-200);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.article-breadcrumb a:hover { color: var(--primitive-color--neutral-0); }
+
+.article-kicker {
+  margin: 0 auto 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--primitive-color--primary-400);
+}
+
+.article-title {
+  margin: 0 auto 20px;
+  font-size: clamp(28px, 5.2vw, 46px);
+  line-height: 1.15;
+  font-weight: 600;
+  color: var(--primitive-color--neutral-0);
+}
+
+.article-lead {
+  margin: 0 auto 24px;
+  font-size: clamp(17px, 2.2vw, 20px);
+  line-height: 1.6;
+  color: var(--primitive-color--neutral-200);
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  font-size: 14px;
+  color: var(--primitive-color--neutral-300);
+}
+
+.article-meta_sep { opacity: .5; }
+
+/* --- obraz wiodacy --- */
+
+.article-figure { margin: 32px auto 0; }
+
+.article-figure_image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+
+/* --- ramka "W skrocie" i spis tresci --- */
+
+.article-summary,
+.article-toc {
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: 14px;
+}
+
+.article-summary { background-color: var(--primitive-color--neutral-50); }
+.article-toc { background-color: var(--primitive-color--neutral-100); }
+
+.article-summary_title,
+.article-toc_title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--primitive-color--primary-700);
+}
+
+.article-summary ul,
+.article-toc ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.article-summary li { margin-bottom: 8px; }
+.article-summary li:last-child { margin-bottom: 0; }
+.article-toc li { margin-bottom: 6px; }
+.article-toc li:last-child { margin-bottom: 0; }
+
+.article-toc a {
+  color: var(--primitive-color--primary-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.article-toc a:hover { color: var(--primitive-color--primary-600); }
+
+/* --- tresc --- */
+
+.article-body {
+  padding-top: 8px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: #333;
+}
+
+.article-body h2 {
+  margin: 48px 0 14px;
+  font-size: clamp(22px, 3.4vw, 30px);
+  line-height: 1.25;
+  color: var(--primitive-color--primary-900);
+}
+
+.article-body h3 {
+  margin: 30px 0 10px;
+  font-size: clamp(18px, 2.4vw, 21px);
+  line-height: 1.35;
+  color: var(--primitive-color--primary-900);
+}
+
+.article-body p { margin: 0 0 18px; }
+
+.article-body ul,
+.article-body ol {
+  margin: 0 0 18px;
+  padding-left: 24px;
+}
+
+.article-body li { margin-bottom: 10px; }
+.article-steps li { margin-bottom: 14px; }
+
+.article-body a {
+  color: var(--primitive-color--primary-600);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- tabela bledow ---
+   Tabela ma trzy kolumny tekstu, wiec ponizej ~520 px robi sie nieczytelna.
+   Zamiast lamac ja na sile, pozwalamy jej przewijac sie w poziomie WEWNATRZ
+   wlasnego kontenera - strona jako calosc nadal nie ma poziomego scrolla. */
+
+.article-table_wrap {
+  overflow-x: auto;
+  margin-bottom: 18px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.article-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.article-table th,
+.article-table td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--primitive-color--neutral-300);
+}
+
+.article-table thead th {
+  background-color: var(--primitive-color--neutral-100);
+  color: var(--primitive-color--primary-900);
+  font-weight: 600;
+  border-bottom-width: 2px;
+}
+
+/* --- zastrzezenie --- */
+
+.article-disclaimer {
+  margin: 32px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--primitive-color--neutral-300);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--primitive-color--gray-500);
+}
+
+/* --- CTA --- */
+
+.article-cta {
+  margin-top: 40px;
+  padding: 32px 24px;
+  border-radius: 16px;
+  background-color: var(--primitive-color--primary-700);
+  color: var(--primitive-color--neutral-0);
+}
+
+.article-cta_title {
+  margin: 0 0 10px;
+  font-size: clamp(20px, 3vw, 26px);
+  color: var(--primitive-color--neutral-0);
+}
+
+.article-cta_text {
+  margin: 0 0 20px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--primitive-color--neutral-200);
+}
+
+.article-cta_actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.article-cta_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background-color: var(--primitive-color--neutral-0);
+  color: var(--primitive-color--primary-900);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color .25s ease;
+}
+
+.article-cta_button:hover { background-color: var(--primitive-color--neutral-200); }
+
+.article-cta_link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  color: var(--primitive-color--neutral-0);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* --- powiazane wpisy --- */
+
+.article-related {
+  padding-top: 48px;
+  padding-bottom: 56px;
+}
+
+.article-related_title {
+  margin: 0 0 18px;
+  font-size: clamp(20px, 3vw, 26px);
+  color: var(--primitive-color--primary-900);
+}
+
+.article-related_list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.article-related_item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 48px;
+  padding: 20px;
+  border: 1px solid var(--primitive-color--neutral-300);
+  border-radius: 14px;
+  color: var(--primitive-color--primary-900);
+  text-decoration: none;
+  transition: border-color .25s ease, background-color .25s ease;
+}
+
+.article-related_item:hover {
+  border-color: var(--primitive-color--primary-600);
+  background-color: var(--primitive-color--neutral-100);
+}
+
+.article-related_item-title {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.article-related_item-cta {
+  font-size: 15px;
+  color: var(--primitive-color--primary-600);
+}
+
+.article-related_note { margin: 0; }
+
+.article-related_note a {
+  color: var(--primitive-color--primary-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Tresc wylacznie dla czytnikow ekranu (podpis tabeli). */
+.article-page .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media screen and (min-width: 768px) {
+  .article-related_list { grid-template-columns: 1fr 1fr; }
+}
+
+@media screen and (max-width: 479px) {
+  .article-page { --article-gutter: 20px; }
+
+  .article-summary,
+  .article-toc,
+  .article-cta { padding: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-cta_button,
+  .article-related_item { transition: none; }
+}
+
+/* Cele dotykowe w linkach nawigacyjnych artykulu.
+   Zmierzone: okruszki 18 px, pozycje spisu tresci 21 px, powrot do listy
+   wpisow 21 px - ponizej 24 px z WCAG 2.2 (2.5.8 Target Size Minimum).
+   To nie sa linki "w zdaniu", ktore norma wylacza spod tego wymagania:
+   okruszki i spis tresci to listy nawigacyjne, wiec wyjatek ich nie obejmuje.
+   Powiekszamy sam obszar klikalny paddingiem w pionie; `inline-block` jest
+   konieczny, bo na elemencie liniowym padding nie zwieksza wysokosci pudelka. */
+
+.article-breadcrumb a,
+.article-toc a,
+.article-related_note a {
+  display: inline-block;
+  padding-block: 5px;
+}
+
+.article-breadcrumb ol { margin-bottom: 14px; }
+.article-toc li { margin-bottom: 2px; }
+
+/* Hamburger jako <button> na stronach artykulow.
+   Pozostale strony maja tu <div role="button"> obslugiwany przez webflow.js.
+   Artykul nie laduje webflow.js, wiec uzywa natywnego <button> - dostaje
+   za darmo obsluge klawiatury i poprawna semantyke, bez dokladania ARIA.
+
+   Cena, ktora trzeba zaplacic: przegladarka daje <button> wlasne tlo.
+   Zmierzone na 390 px: `background-color: rgb(240, 240, 240)` zamiast
+   przezroczystego - czyli jasny prostokat 24x18 px na ciemnym pasku,
+   dokladnie pod ikona. Geometria byla identyczna jak w <div>, wiec porownanie
+   pudelek tego nie pokazalo; wyszlo dopiero przy liczeniu kontrastu, gdy tlem
+   okazal sie sam przycisk zamiast paska.
+
+   `all: unset` odpada - skasowaloby tez reguly Webflow, ktore ustawiaja
+   ten przycisk. Zerujemy wylacznie to, co przegladarka dokłada od siebie. */
+
+button.navbar-toggler-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: 0;
+  text-align: inherit;
+  color: inherit;
+  /* Bez `font: inherit` - to nadpisalo by `.w-nav-button { font-size: 24px }`
+     Webflow i przycisk mialby 16 px zamiast 24 px jak na pozostalych stronach.
+     Rodzina fontu i tak jest dziedziczona z `.navbar-toggler-button`. */
+}

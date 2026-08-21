@@ -118,9 +118,53 @@ w CSS, bo w samym HTML tego nie ma.
    wyszlo, ze pasek ma `height:auto`, wiec przy **768-991 px mierzy 67 px, a nie 69**;
    wysokosc jest teraz mierzona w JS i publikowana jako `--navbar-h` / `--navbar-inner-h`,
    zamiast stalych zgadywanych per breakpoint.
-2. **Podstrony bloga nie istnieja.** Wszystkie linki artykulow prowadza do `blog.html` - i to
-   nie jest zla sciezka, tylko brak plikow. W repo sa wylacznie 4 strony nawigacyjne.
-   Uzgodniony kierunek: najpierw **jeden artykul jako wzorzec**, potem reszta. Nie zrobione.
+2. **Podstrony bloga: wzorzec GOTOWY 2026-08-21, zostaje 5 wpisow.**
+   Pierwszy realny artykul: `blog/jak-prawidlowo-szczotkowac-zeby.html` - wyrozniony wpis
+   z `blog.html`, podlinkowany stamtad z trzech miejsc. Pozostale piec tytulow celowo
+   nadal prowadzi do `blog.html`, zeby nie robic martwych odnosnikow.
+
+   **Konwencja:** `blog/<slug>.html`, zasoby przez `../assets/...`. Podkatalog, bo przy
+   szesciu wpisach root przestaje byc czytelny, a `/blog/slug.html` lepiej wyglada w SERP.
+
+   **Uklad strony:** ciemny pas naglowka (okruszki, kicker, H1, lead, metadane) -> obraz
+   wiodacy -> ramka "W skrocie" -> spis tresci z kotwicami -> tresc H2/H3 -> tabela
+   "blad / dlaczego szkodzi / jak poprawic" -> FAQ -> zastrzezenie -> CTA -> powiazane wpisy.
+   Dane strukturalne: `BlogPosting` + `BreadcrumbList` + `FAQPage` w jednym `@graph`,
+   spiete z istniejacym wezlem `Dentist` przez `@id`.
+
+   **DLACZEGO NAGLOWEK JEST CIEMNY.** Nie z powodow estetycznych. `.navbar_wrap` jest
+   przezroczysty do pierwszego przewiniecia, linki maja kolor #f3f6ff, logo jest w wariancie
+   jasnym - pasek zaprojektowano pod ciemne hero. Na bialej stronie artykulu nawigacja
+   bylaby bialym tekstem na bialym tle. Ciemny pas rozwiazuje to bez wyjatku w regulach paska.
+
+   **ARTYKUL NIE LADUJE jQuery, WEBFLOW ANI GSAP.** Strony nawigacyjne ciagna 714 KB JS
+   (179 KB po gzipie) - szescikrotnosc calego CSS po czterech partiach odchudzania. Artykul
+   to sam tekst; potrzebuje wylacznie dzialajacego menu. Menu obsluguje ~45 linii wlasnego
+   skryptu, ktory odtwarza DOKLADNIE te zmiany w DOM, na ktorych opiera sie CSS: `.w--open`
+   na przycisku, `.w-nav-overlay` w `.navbar_wrap`, `data-nav-menu-open` na `<nav>`.
+   Skrypty wspoldzielone (pasek `.is-scrolled`, pulapka fokusu, oslona obrazkow) sa wyjmowane
+   z `blog.html` PROGRAMOWO przy skladaniu pliku, wiec nie rozjada sie z reszta serwisu.
+
+   Efekt uboczny na plus: bez `webflow.js` nie ma przechwytywania kotwic, wiec skip link
+   i spis tresci przenosza fokus natywnie - lata z sekcji 4 nie jest tu potrzebna.
+
+   **Hamburger to `<button>`, nie `<div role="button">`.** Bez webflow.js nikt nie dokłada
+   ARIA ani obslugi klawiatury, a natywny `<button>` daje jedno i drugie za darmo.
+   Pulapka, ktora to kosztowalo: przegladarka nadaje `<button>` wlasne tlo
+   (`rgb(240, 240, 240)`), czyli jasny prostokat 24x18 px na ciemnym pasku. Geometria byla
+   identyczna jak w `<div>`, wiec porownanie pudelek tego NIE pokazalo - wyszlo dopiero
+   przy liczeniu kontrastu, gdy tlem okazal sie sam przycisk zamiast paska. Reset jest
+   w arkuszu; `all: unset` odpada, bo skasowalby tez reguly Webflow ustawiajace ten przycisk.
+
+   **TODO: CLIENT CONFIRMATION** - podpis autora (konkretny lekarz z tytulem czy "Zespol
+   Amico Dental") oraz data publikacji. Dotyczy tresci widocznej i pola `author`
+   w danych strukturalnych.
+
+   **Jak dodac kolejny wpis:** skopiowac plik wzorcowy, podmienic tresc, `<title>`,
+   `description`, OG, `canonical`, `@id`/`url` w JSON-LD, FAQ, obraz wiodacy i powiazane
+   wpisy; podpiac link w `blog.html`; dopisac `<url>` w `sitemap.xml`. Chrome (pasek,
+   stopka, skrypty) zostawic bez zmian - jesli zmienia sie w `blog.html`, przeniesc je
+   ponownie skryptem, a nie recznie.
 3. ~~**Pola formularza nie maja etykiet.**~~ **ZROBIONE 2026-08-21.** Widoczne etykiety
    zamiast placeholderow. Formularz jest **tylko na `index.html`** - podstrony go nie maja.
    Domkniete tego samego dnia: bledne pole dostaje `aria-invalid`, jest wiazane
@@ -275,3 +319,24 @@ Dwa artefakty tej sondy, warte zapamietania, bo oba wygladaly jak bledy strony:
 - **Fokus na `<body>` po ostatnim elemencie nawigacji to NIE wyciek z pulapki**, tylko
   udokumentowany stan domykany osobnym nasluchem. Wyciekiem byloby dopiero trafienie
   w tresc pod `inert`.
+
+**Pomiar nie zastepuje zrzutu ekranu - i odwrotnie.** Przy pierwszej wersji strony artykulu
+WSZYSTKIE sondy byly zielone: zero poziomego scrolla na 320/390/768/1440, zero bledow
+konsoli, poprawna hierarchia naglowkow, kontrast tekstu powyzej AA, kotwice spisu tresci
+na miejscu, pasek nawigacji mierzacy sie identycznie jak na `blog.html`. Zrzut ekranu
+pokazal uklad ewidentnie zepsuty: okruszki wysrodkowane, a kicker, H1, lead i metadane
+przyklejone do lewej krawedzi okna.
+
+Przyczyna byla czysto CSS-owa: wspolna regula szerokosci dawala `margin-inline: auto`,
+a pozniejsze reguly poszczegolnych elementow ustawialy `margin: 0 0 20px` - skrot `margin`
+zeruje rowniez `margin-inline`, wiec kasowal wysrodkowanie. Okruszki przezyly tylko dlatego,
+ze marginesu nie mial sam `<nav>`, tylko `<ol>` w srodku.
+
+Dwa wnioski:
+- **Do nowej strony (bez "wersji przed") dorzuc pomiar SPOJNOSCI, nie tylko poprawnosci.**
+  Tutaj wystarczylo porownac lewe krawedzie elementow kolumny tekstu - po poprawce wszystkie
+  daja `340 .. 1100` przy 1440 px i `20 .. 370` przy 390 px. Sonda, ktora sprawdza tylko
+  "czy cos jest zle same w sobie", takiego rozjazdu nie widzi.
+- **Uwazaj na skroty CSS przy wzorcu `width` + `margin-inline: auto`.** `margin: 0 0 20px`
+  w pozniejszej regule cicho wylacza wysrodkowanie. Bezpieczniej `margin-block` albo
+  jawne `margin: 0 auto 20px`.
