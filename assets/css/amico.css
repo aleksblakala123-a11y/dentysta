@@ -6084,3 +6084,113 @@ button.navbar-toggler-button {
 @media (prefers-reduced-motion: reduce) {
   .opinie-google_akcje a { transition: none; }
 }
+
+/* ===== Mapa dojazdu, ladowana na klikniecie =====
+   Zmierzone przed decyzja: osadzona mapa Google to 42 zadania i 663 KB,
+   OpenStreetMap 13 zadan i 1035 KB. Cala strona glowna ma dzis 22 zadania
+   i 657 KB - kazdy z tych wariantow PODWAJA wage strony, na ktorej stanie.
+
+   Stad wzorzec "dwoch klikniec": do momentu, w ktorym uzytkownik sam poprosi
+   o mape, nie leci ani jedno zadanie do Google. Przy okazji zalatwia to zgody -
+   nic sie nie laduje bez swiadomej decyzji, a przycisk mowi wprost, co zrobi.
+
+   Proporcja 16:10 na placeholderze i na iframe jest ta sama, wiec zamiana
+   jednego na drugie nie przesuwa niczego pod spodem (zero CLS). ===== */
+
+.mapa-wrap { margin-bottom: 24px; }
+
+/* Proporcja 16:10 jest tu PODLOGA, nie sztywnym rozmiarem. Zmierzone: przy
+   320 px tresc placeholdera ma 246 px, a pudelko 16:10 tylko 180 px - przy
+   ustawionym `overflow: hidden` link "Albo otworz od razu w Google Maps" znikal,
+   a przy 390 px byl przyciety o 20 px. Placeholder moze wiec urosnac, mapa nie:
+   iframe trzyma proporcje, zeby po podmianie nic sie nie przesunelo.
+   Zmierzone po poprawce: przesuniecie ukladu 0 px na wszystkich szerokosciach. */
+
+.mapa-placeholder {
+  /* Ta sama proporcja co mapa, zeby podmiana placeholdera na iframe nie
+     przesunela niczego pod spodem. KLUCZOWE: bez `overflow: hidden`. To wlasnie
+     ono wylaczalo automatyczny minimalny rozmiar pudelka i zamiast pozwolic mu
+     urosnac - przycinalo tresc. */
+  /* `width: 100%` jest tu OBOWIAZKOWE, nie kosmetyczne. `aspect-ratio` dziala
+     w obie strony: przy `min-height: 320px` przegladarka wylicza z niej SZEROKOSC
+     jako 320 x 1,6 = 512 px i ignoruje szerokosc rodzica. Zmierzone bez tej linii:
+     pudelko 512 px w kontenerze 288 px, wystajace 208 px poza okno. */
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 320px;
+  border-radius: 14px;
+}
+
+.mapa-osadzona {
+  /* Ta sama podloga 320 px co placeholder. Dwa powody: 16:10 przy 320 px
+     szerokosci daje mape wysoka na 180 px, czyli praktycznie bezuzyteczna na
+     telefonie; a rowna wysokosc obu pudelek sprawia, ze podmiana nie przesuwa
+     niczego pod spodem. Zmierzone: roznica wysokosci strony 0 px na 320, 390,
+     768 i 1440 px. */
+  aspect-ratio: 16 / 10;
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.mapa-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px;
+  border: 1px solid var(--primitive-color--neutral-300);
+  background-color: var(--primitive-color--neutral-100);
+}
+
+.mapa-placeholder_tekst {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--primitive-color--gray-600);
+}
+
+.mapa-placeholder_btn {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--primitive-color--primary-700);
+  color: var(--primitive-color--neutral-0);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .25s ease;
+}
+
+.mapa-placeholder_btn:hover { background-color: var(--primitive-color--primary-900); }
+
+.mapa-placeholder_alt { margin: 0; font-size: 15px; }
+
+.mapa-placeholder_alt a {
+  display: inline-block;
+  padding-block: 4px;
+  color: var(--primitive-color--primary-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mapa-osadzona {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+@media screen and (max-width: 479px) {
+  .mapa-placeholder { padding: 20px; }
+  .mapa-placeholder_tekst { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapa-placeholder_btn { transition: none; }
+}

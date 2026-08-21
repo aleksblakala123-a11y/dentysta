@@ -788,3 +788,85 @@ przez `elementFromPoint` na srodku przycisku, nie po samym istnieniu elementu.
 
 Zmiana to jedna linia w jednym pliku, **bez dotykania CSS** - wiec `?v=` zostaje
 na `20260821k`.
+---
+
+## 11. Mapa dojazdu i korekta oceny (2026-08-21)
+
+### Mapa ladowana na klikniecie
+
+Zmierzone PRZED decyzja, ile kosztuje osadzona mapa:
+
+| wariant | zadan | bajtow |
+|---|---|---|
+| Google Maps (`output=embed`, bez klucza) | 42 | 663 KB |
+| OpenStreetMap (`export/embed`) | 13 | 1035 KB |
+| *dla porownania: cala strona glowna* | *22* | *657 KB* |
+
+Kazdy wariant **podwaja wage strony**, na ktorej stanie. Stad wzorzec dwoch
+klikniec: `about.html` pokazuje placeholder z wyjasnieniem i przyciskiem,
+a iframe wstrzykiwany jest dopiero po nacisnieciu. Zmierzone: **przed klikiem
+zero zadan do jakiegokolwiek obcego hosta**, po kliknieciu mapa laduje sie
+normalnie. Przy okazji zalatwia to zgody - nic nie leci do Google bez swiadomej
+decyzji uzytkownika, a przycisk mowi wprost, co zrobi.
+
+Link "Otworz w Google Maps" prowadzil wczesniej do WYSZUKIWANIA adresu.
+Teraz prowadzi przez Place ID wprost na wizytowke gabinetu.
+
+### Place ID nie dziala w darmowym osadzeniu
+
+Sprawdzone w przegladarce: `maps.google.com/maps?q=place_id:...&output=embed`
+pokazuje **cala kule ziemska**. Place ID obsluguje dopiero platne Maps Embed API
+z kluczem. Dziala zapytanie adresowe - i to ono pokazuje karte firmy z nazwa,
+adresem i ocena. W linku (nie w osadzeniu) Place ID dziala poprawnie.
+
+### Ocena poprawiona: 4,1/62 -> 4,2/73
+
+Karta firmy w osadzonej mapie pokazuje **4,2 z 73 opinii**. Poprzednia wartosc
+pochodzila z agregatora porownajdentyste.pl i byla nieaktualna. Nowa liczba jest
+odczytana z widoku samego Google, wiec zrodlo jest pierwszej reki - `TODO:
+CLIENT CONFIRMATION` przy ocenie zastapione notka o zrodle i dacie odczytu.
+
+### DWA BLEDY ZLAPANE PRZY TEJ ZMIANIE
+
+**1. `aspect-ratio` wylicza SZEROKOSC z `min-height`.**
+Placeholder dostal `aspect-ratio: 16/10` i `min-height: 320px`. Przegladarka
+policzyla z tego szerokosc 320 x 1,6 = **512 px** i zignorowala szerokosc rodzica
+(288 px). Pudelko wystawalo 208 px poza okno. Lek: jawne `width: 100%`.
+
+**2. `hScroll === 0` NIE JEST DOWODEM, ze nic nie wystaje.**
+To jest najwazniejszy wniosek tej sesji i dotyczy wstecz wszystkich pomiarow.
+`.page-wrapper` ma `overflow: clip`, wiec element szerszy od okna **nie tworzy
+paska przewijania** - zostaje przyciety i po prostu znika. Placeholder mapy mial
+512 px w kontenerze 288 px, tekst byl obciety w polowie zdania, a licznik
+`scrollWidth - clientWidth` przez caly czas pokazywal **0**.
+
+Zlapal to dopiero zrzut ekranu. Do zestawu narzedzi doszedl `przepelnienie.js` -
+skan sprawdzajacy KAZDY element osobno, czy jego krawedz wychodzi poza okno.
+
+**Znane klasy falszywych alarmow tej sondy** (dwie odsiewane, jedna nie):
+- *odsiewana:* element w przodku z `overflow-x: auto/scroll` - tak dziala tabela
+  cen i tabele w artykulach, ktore celowo przewijaja sie w poziomie;
+- *odsiewana:* elementy bez wlasnej tresci - `.hero_gradient`, `.cta_overlay`
+  to puste divy z gradientem, celowo wychodzace poza kontener;
+- **NIEODSIEWANA:** karuzela uslug na `index.html`, sterowana przewijaniem przez
+  GSAP. Jej karty stoja poza oknem przy scrollY=0 i wjezdzaja przy przewijaniu -
+  sonda zglasza je jako przepelnienie. Sprawdzone recznie:
+  `.service-item_info-title` przy scrollY=0 jest na 32..340 w oknie 390 px,
+  a po przewinieciu do sekcji uslug na -988..-680. Tresc jest osiagalna,
+  tylko w innym momencie. **Przy czytaniu wynikow sondy te trafienia pomijac.**
+
+### Kontrola
+
+Placeholder i mapa na 320/390/768/1440: tresc nieprzycieta, nic nie wychodzi poza
+okno, przycisk 48 px, zero bledow konsoli, **przesuniecie ukladu po podmianie
+0 px na kazdej szerokosci** (obie ramki maja te sama proporcje i te sama podloge
+320 px - przy 320 px mapa 16:10 mialaby 180 px wysokosci, czyli bylaby
+bezuzyteczna na telefonie).
+
+### Backlog: wskazowki dojazdu
+
+Sama mapa nie zastapi zdania "wejscie od podworza, drugie pietro, parking przed
+budynkiem". Gabinet mieści sie w lokalu **9/20/21**, czyli w budynku z numeracja
+mieszkan - trafienie tam bez wskazowek jest realna bariera.
+**Wymaga od gabinetu:** opisu wejscia, pietra i mozliwosci parkowania.
+Tego nie da sie napisac z wyobrazni.

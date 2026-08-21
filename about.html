@@ -48,7 +48,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260821k" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260821l" rel="stylesheet" type="text/css"/>
         <style>
 
         </style>
@@ -517,12 +517,19 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="mapa-wrap">
+                                    <div class="mapa-placeholder" data-mapa="https://maps.google.com/maps?q=Amico%20Dental%2C%20ul.%20Bronis%C5%82awa%20Ratajczaka%209%2C%2021-040%20%C5%9Awidnik&amp;output=embed">
+                                        <p class="mapa-placeholder_tekst">Mapa jest ładowana z serwerów Google dopiero po kliknięciu — dzięki temu strona otwiera się szybciej, a Google nie dowiaduje się o Twojej wizycie, jeśli mapa nie jest Ci potrzebna.</p>
+                                        <button type="button" class="mapa-placeholder_btn">Pokaż mapę dojazdu</button>
+                                        <p class="mapa-placeholder_alt"><a href="https://www.google.com/maps/place/?q=place_id:ChIJGbb8sEhUIkcR8cLGWtfI1UI" target="_blank" rel="noopener">Albo otwórz od razu w Google Maps</a></p>
+                                    </div>
+                                </div>
                                 <div class="locatioin_item">
                                     <div class="location_content">
                                         <div class="location_title">Amico Dental</div>
                                         <p class="location_para">ul. Bronisława Ratajczaka 9/20/21, 21-040 Świdnik</p>
                                         <div class="button-container" style="margin-top:1rem">
-                                            <a href="https://www.google.com/maps/search/?api=1&amp;query=ul.+Bronis%C5%82awa+Ratajczaka+9%2F20%2F21%2C+21-040+%C5%9Awidnik" target="_blank" rel="noopener" data-wf--button-primary--variant="light-small" class="button_primary w-variant-fb89ee7f-8db1-8e54-55c6-075f0151c951 w-inline-block">
+                                            <a href="https://www.google.com/maps/place/?q=place_id:ChIJGbb8sEhUIkcR8cLGWtfI1UI" target="_blank" rel="noopener" target="_blank" rel="noopener" data-wf--button-primary--variant="light-small" class="button_primary w-variant-fb89ee7f-8db1-8e54-55c6-075f0151c951 w-inline-block">
                                                 <div class="button_inner">
                                                     <div class="button-text_wrap">
                                                         <div class="button_text">Otwórz w Google Maps</div>
@@ -960,6 +967,34 @@
     toggler.focus();
   });
 
+})();
+</script>
+<script>
+/* Mapa na klikniecie. Do momentu nacisniecia przycisku strona nie wysyla ani
+   jednego zadania do Google - zmierzone: osadzona mapa to 42 zadania i 663 KB.
+   Adres osadzenia siedzi w atrybucie `data-mapa`, wiec skrypt nie zna zadnego
+   URL-a na sztywno i nie trzeba go ruszac przy zmianie adresu gabinetu. */
+(function () {
+  var pole = document.querySelector('.mapa-placeholder');
+  if (!pole) return;
+  var btn = pole.querySelector('.mapa-placeholder_btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', function () {
+    var src = pole.getAttribute('data-mapa');
+    if (!src) return;
+    var ramka = document.createElement('iframe');
+    ramka.className = 'mapa-osadzona';
+    ramka.src = src;
+    ramka.title = 'Mapa dojazdu do gabinetu Amico Dental, ul. Bronisława Ratajczaka 9/20/21 w Świdniku';
+    ramka.loading = 'lazy';
+    ramka.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+    pole.parentNode.replaceChild(ramka, pole);
+    /* Fokus na ramke, zeby osoba korzystajaca z klawiatury nie zostala
+       z fokusem na przycisku, ktorego juz nie ma w drzewie. */
+    ramka.setAttribute('tabindex', '-1');
+    ramka.focus({ preventScroll: true });
+  });
 })();
 </script>
 </body>
