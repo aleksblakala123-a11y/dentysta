@@ -6494,3 +6494,63 @@ button.navbar-toggler-button {
   padding-top: 11px;
   padding-bottom: 11px;
 }
+
+/* ===== Widoczny fokus klawiatury, globalnie =====
+   Fokus dzialal, ale wylacznie na domyslnym ringu przegladarki - w calym
+   arkuszu byly tylko 3 reguly :focus-visible, kazda dla jednego widgetu
+   (service-item_trigger, faq_header, testimonial-slider_arrow).
+
+   DLACZEGO DWA TONY, A NIE JEDEN KOLOR:
+   Ten sam ring musi byc widoczny na trzech rodzajach tla - bialym,
+   ciemnym #022F34 i na zdjeciu gabinetu w sekcji zespolu. Policzone:
+   najlepszy pojedynczy kolor (markowy teal #1f8c98) daje 3.99:1 na bialym
+   i 3.61:1 na ciemnym, ale tylko 1.12:1 na zdjeciu (srednia rgb(139,137,109)) -
+   czyli znika dokladnie tam, gdzie kafle lekarzy stykaja sie z fotografia.
+
+   Dwa tony rozwiazuja to bez kompromisu: biala otoczka 2 px wypelnia szczeline
+   outline-offset, ciemny pierscien 3 px idzie na zewnatrz. Na kazdym tle
+   co najmniej jeden z nich ma kontrast grubo powyzej 3:1.
+
+   Trzy istniejace reguly :focus-visible maja wyzsza specyficznosc (0,2,0)
+   niz ta (0,1,1), wiec nadal wygrywaja na swoich widgetach - zostaja.
+
+   box-shadow nadpisuje cien .navbar_link, ale to bezpieczne: zmierzone,
+   ze jest bialy i w 4 z 5 przypadkow ma zerowy rozmiar, czyli na bialym
+   pasku i tak niczego nie rysuje.
+
+   Bez border-radius w tej regule - outline sam idzie za promieniem elementu,
+   a jawna wartosc scinalaby rogi przyciskom pigulkowym. */
+
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #022f34;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+/* Webflow zostawil cztery resety :focus { outline: 0 } o specyficznosci (0,2,0),
+   ktore bija regule wyzej (0,1,1) i kasuja z niej sam outline - otoczka
+   i offset przechodza, wiec efekt byl mylacy: na bialym tle zostawala
+   sama biala obwodka, czyli nic.
+
+   Trzy z tych elementow (strzalki slidera, hamburger) i tak przegrywaly,
+   bo maja role="button", a moj selektor atrybutowy tez ma (0,2,0) i stoi
+   pozniej. Ale .w-tab-link to zwykly <a> - i to na nim siedzi calе FAQ.
+   Zmierzone na index.html: 5 pozycji FAQ bez widocznego pierscienia fokusu.
+
+   Dlatego te same wartosci powtorzone na selektorach klasowych (0,2,0). */
+
+.w-tab-link:focus-visible,
+.w-slider-dot:focus-visible,
+.w-slider-arrow-left:focus-visible,
+.w-slider-arrow-right:focus-visible,
+.w-nav-button:focus-visible {
+  outline: 3px solid #022f34;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #ffffff;
+}
