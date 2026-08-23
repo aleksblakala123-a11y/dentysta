@@ -720,49 +720,86 @@
         <script src="assets/js/SplitText.min.js" type="text/javascript"></script>
         <script src="assets/js/ScrollTrigger.min.js" type="text/javascript"></script>
         <script>
+            /* ===== Licznik w hero, wersja natywna =====
+               BYLO: gsap.set(el, {innerText: 0}) + gsap.to(el, {innerText: N}).
+               GSAP w tym buildzie nie ma TextPlugin, wiec tween na innerText jest
+               no-opem - sonda gsap.to(el,{innerText:100}) dawala 0 wywolan onUpdate
+               (zarejestrowane pluginy: Attr, EndArray, RoundProps, Modifiers, Snap,
+               CSS, Observer, ScrollTrigger). Poprzedzajacy gsap.set DZIALAL, wiec
+               licznik zostawal na stale na "0" - strona reklamowala gabinet liczba
+               "0 Lekarzy specjalistow". ScrollTrigger liczyl dodatkowo start: -8001,
+               bo pozycja byla brana przed ulozeniem layoutu.
 
-            gsap.registerPlugin(ScrollTrigger);
+               JEST: IntersectionObserver + requestAnimationFrame, zero bibliotek.
+               Wartosci docelowe czytane z DOM (.count-number), nie hardkodowane -
+               dzieki temu HTML bez JS pokazuje prawdziwe 5 i 6.
+               Zero wpisujemy dopiero w chwili startu animacji, nie na starcie skryptu:
+               jesli cokolwiek pojdzie nie tak, uzytkownik widzi prawdziwa liczbe,
+               a nie zero. To byl caly mechanizm poprzedniej awarii.
+               Czas trwania 1100 ms zamiast 3.5 s - liczenie do 5 przez 3,5 sekundy
+               konczylo sie tym, ze uzytkownik odjezdzal scrollem przed koncem. */
+            (function () {
+                var REDUCED = window.matchMedia
+                    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                var DURATION = 1100;
 
-            document.addEventListener("DOMContentLoaded", () => {
+                function animate(el, target, suffix) {
+                    var start = null;
+                    el.textContent = '0' + suffix;
 
-                initCounterAnimations();
-            }
-            );
-
-            /* ========== GSAP COUNTER ========== */
-            function initCounterAnimations() {
-                const counters = document.querySelectorAll(".about-hero_info-item_title");
-
-                counters.forEach( (counter) => {
-                    const targetText = counter.textContent.trim();
-                    const targetNumber = parseFloat(targetText.replace(/[^\d.]/g, "")) || 0;
-                    const suffix = targetText.replace(/[\d.,\s]/g, "");
-
-                    // Start from 0
-                    gsap.set(counter, {
-                        innerText: 0
-                    });
-
-                    gsap.to(counter, {
-                        innerText: targetNumber,
-                        duration: 3.5,
-                        ease: "power2.out",
-                        snap: {
-                            innerText: 1
-                        },
-                        scrollTrigger: {
-                            trigger: counter,
-                            start: "top 85%",
-                            toggleActions: "play none none reset"
-                        },
-                        onUpdate: function() {
-                            const value = Math.ceil(this.targets()[0].innerText);
-                            counter.innerText = value.toLocaleString("en-US") + suffix;
+                    function step(now) {
+                        if (start === null) start = now;
+                        var p = Math.min((now - start) / DURATION, 1);
+                        var eased = 1 - Math.pow(1 - p, 3); /* easeOutCubic */
+                        if (p < 1) {
+                            el.textContent = Math.round(eased * target) + suffix;
+                            requestAnimationFrame(step);
+                        } else {
+                            el.textContent = target + suffix;
                         }
+                    }
+
+                    requestAnimationFrame(step);
+                }
+
+                function init() {
+                    var nodes = document.querySelectorAll('.about-hero_info-item_title .count-number');
+                    if (!nodes.length) return;
+
+                    Array.prototype.forEach.call(nodes, function (el) {
+                        var raw = el.textContent.trim();
+                        var target = parseInt(raw.replace(/[^\d]/g, ''), 10);
+
+                        /* Nie da sie odczytac liczby - nie ruszamy DOM.
+                           Zostaje tresc z HTML, czyli prawda, a nie 0. */
+                        if (!isFinite(target)) return;
+
+                        var suffix = raw.replace(/[\d\s]/g, '');
+
+                        if (REDUCED || !('IntersectionObserver' in window)) {
+                            el.textContent = target + suffix;
+                            return;
+                        }
+
+                        var io = new IntersectionObserver(function (entries) {
+                            for (var i = 0; i < entries.length; i++) {
+                                if (!entries[i].isIntersecting) continue;
+                                io.disconnect();
+                                animate(el, target, suffix);
+                                return;
+                            }
+                        }, { threshold: 0.4 });
+
+                        io.observe(el);
                     });
                 }
-                );
-            }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', init);
+                } else {
+                    init();
+                }
+            })();
         </script>
         <script>
             /* Amico reveal engine v3, fade/slide reveals via IntersectionObserver.
