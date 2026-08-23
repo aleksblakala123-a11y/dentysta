@@ -4694,7 +4694,6 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 .section_team{background-image:url('../img/gen_team-bg.jpg')!important;background-image:image-set(url('../img/opt/gen_team-bg-800w.webp') 1x, url('../img/opt/gen_team-bg-1200w.webp') 2x)!important;background-size:cover!important;background-position:center!important;scroll-margin-top:88px;}
 .section_team .home-team_header-title,.section_team .home-team_header-para{color:#ffffff!important;}
 .section_team .home-team_header-para{color:rgba(255,255,255,.85)!important;}
-.section_team .text-highlighted{color:#7fe3ef!important;}
 .section_team .section_tag{background:rgba(255,255,255,.16)!important;color:#ffffff!important;}
 .section_team .section_tag svg, .section_team .section_tag path{color:#ffffff!important;fill:#ffffff!important;}
 
@@ -6398,4 +6397,46 @@ button.navbar-toggler-button {
   /* Kadr portretowy: lekki bias ku gorze, zeby przyciecie szlo po tulowiu,
      a nie po brodzie. */
   object-position: center 20%;
+}
+
+/* ===== Kontrast gradientu .text-highlighted =====
+   Zmierzone na wszystkich 19 wystapieniach na 4 stronach. Jeden gradient
+   nie moze obsluzyc trzech roznych teł, na ktorych ten span wystepuje:
+
+   1. TŁA JASNE (bialy, FAQ #FEF5EC, scrim zespolu #F2F5F4, lokalizacja #DDEBEC)
+      Jasny koniec #24A3B1 dawal 2.47-3.02:1 przy wymaganych 3:1 dla duzego
+      tekstu. Najgorsze bylo #DDEBEC z 2.47. Nowy koniec #1d8490 to ten sam
+      odcien (186 deg) i ta sama nasyconosc (66%), tylko glebsza jasnosc
+      (41% -> 34%): 3.61 na najgorszym tle, 4.42 na bialym.
+
+   2. TŁA CIEMNE (#022F34: CTA, opinie, showcase uslug)
+      Tu jest odwrotnie - to CIEMNY koniec jest blisko progu (3.2:1).
+      Globalne przyciemnienie zepsuloby te sekcje, wiec zostaje przy
+      oryginalnym gradiencie.
+
+   3. ZDJĘCIE (.section_team.is-home na index.html)
+      Nagłówek lezy wprost na fotografii gabinetu (srednia rgb(139,137,109)),
+      bez scrimu. Oba konce gradientu dawaly tam 1.26 i 1.18:1 - tekst
+      praktycznie niewidoczny. Gradient odpada calkowicie; span staje sie
+      bialy jak reszta naglowka i dziedziczy jego text-shadow.
+
+   Uwaga na kolejnosc: regula .section_team .text-highlighted{color:#7fe3ef
+   !important} zostala wyzej usunieta. Byla martwa dopoki text-fill jest
+   przezroczysty, ale ponizej wlaczamy currentColor - wtedy jej !important
+   wygralby z bialym i dal cyjan 2.4:1 na zdjeciu. */
+
+.text-highlighted {
+  background-image: linear-gradient(94deg, #587d81, #1d8490);
+}
+
+.section_cta .text-highlighted,
+.section_testimonial .text-highlighted,
+.section_service.is-service-showcase .text-highlighted {
+  background-image: linear-gradient(94deg, #587d81, #24a3b1);
+}
+
+.section_team.is-home .text-highlighted {
+  background-image: none;
+  -webkit-text-fill-color: currentColor;
+  color: #ffffff;
 }
