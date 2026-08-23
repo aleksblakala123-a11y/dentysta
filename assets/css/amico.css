@@ -4701,7 +4701,10 @@ footer{border-top:3px solid var(--primitive-color--primary-500,#24a3b1);}
 .section_team .home-team_header-title,.section_team .home-team_header-para{text-shadow:0 2px 14px rgba(0,0,0,.45);}
 
 /* Safety: reveal/portrait/blog images must never stay blurred (no leftover IX2 blur) */
-.team_image,.blog-item_image,.our-story_image,.about-hero_image,.home-value_image{filter:none !important;-webkit-filter:none !important;}
+/* Usuniete z listy .team_image i .our-story_image - zero wystapien w jakimkolwiek
+   HTML. .team_image byl zdjeciami lekarzy, podmienionymi na inicjaly w a64256e;
+   .our-story_image zniknal razem ze swoja sekcja. Pozostale trzy selektory zyja. */
+.blog-item_image,.about-hero_image,.home-value_image{filter:none !important;-webkit-filter:none !important;}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
