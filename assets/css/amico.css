@@ -6611,3 +6611,88 @@ summary:focus-visible {
 .faq_description:not(.is-open) .faq-description_inner {
   padding-top: 0;
 }
+
+/* ===== Sticky CTA z telefonem na mobile =====
+   Zmierzone przed zmiana przy 320 px: przycisk "Zadzwon" w pasku nawigacji
+   mial 0x0 px (schowany w menu), a jedyne elementy fixed to skip-link i pasek.
+   Zeby zadzwonic, uzytkownik musial otworzyc hamburger albo przewinac 8299 px
+   do sekcji kontaktowej. Dla gabinetu telefon jest cala konwersja, wiec
+   dostaje wlasne, stale miejsce.
+
+   Jeden przycisk, nie dwa - "Zadzwon" obok "Umow wizyte" rozmywaloby
+   akcje glowna, a oba i tak prowadza do tego samego numeru. */
+
+.cta-mobilne {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .cta-mobilne {
+    display: block;
+    position: fixed;
+    inset: auto 0 0 0;
+    /* Pod .w-nav (z-index 1000), zeby otwarte menu przykrywalo pasek. */
+    z-index: 900;
+    background: var(--primitive-color--neutral-0);
+    border-top: 1px solid var(--primitive-color--neutral-300);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .cta-mobilne_link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: var(--_size-variables---border-radius--8xl);
+    background: var(--primitive-color--primary-900);
+    color: var(--primitive-color--neutral-0);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .cta-mobilne_link svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+
+  /* Pasek zaslanialby stopke - oddajemy mu miejsce na koncu dokumentu. */
+  body {
+    padding-bottom: 84px;
+  }
+}
+
+/* Przy otwartym menu pasek znika - inaczej sterczalby nad nakladka.
+   Wyzsza specyficznosc niz regula w @media, wiec kolejnosc nie ma znaczenia. */
+html:has(.w-nav-button.w--open) .cta-mobilne {
+  display: none;
+}
+
+/* ===== Linki kontekstowe w tresci =====
+   Z about.html wychodzily tylko 2 linki do uslug i 1 do cennika, przy
+   12 linkach do samej siebie. Doszly dwa linki w akapitach - ale musza
+   dzialac i na bialym tle, i w ciemnym kaflu "8 zakresow leczenia".
+
+   Zmierzone przed poprawka: link w ciemnym kaflu odziedziczyl granatowy
+   kolor linku i mial kontrast 1.19:1 do tla, czyli byl niewidoczny.
+   Stad color: inherit - kontrast jest zawsze taki sam jak otaczajacego
+   tekstu, wiec nie da sie go zepsuc zmiana tla sekcji.
+
+   Podkreslenie, a nie sam kolor: WCAG 1.4.1 wymaga, zeby link w akapicie
+   dalo sie odroznic czyms wiecej niz barwa. */
+
+.link-tresc {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-thickness .15s ease;
+}
+
+.link-tresc:hover {
+  text-decoration-thickness: 2px;
+}
