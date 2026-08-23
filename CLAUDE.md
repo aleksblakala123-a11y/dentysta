@@ -31,8 +31,13 @@ Repo: `aleksblakala123-a11y/dentysta` -> GitHub Pages: https://aleksblakala123-a
 
 ## OBOWIAZKOWE: cache-busting
 
-Po **kazdej** zmianie w `assets/css/amico.css` podbij `?v=` w tagu `<link>` we **wszystkich czterech**
-plikach HTML. Format: `?v=RRRRMMDDx`, np. `?v=20260820k`.
+Po **kazdej** zmianie w `assets/css/amico.css` podbij `?v=` w tagu `<link>` we **wszystkich 12**
+plikach HTML, ktore go linkuja. Format: `?v=RRRRMMDDx`, np. `?v=20260820k`.
+
+Aktualna lista (stan 2026-08-23): `index`, `about`, `service`, `blog`, `cennik`,
+`cennik-medycyna-estetyczna` w katalogu glownym oraz 6 wpisow w `blog/`.
+Wczesniej bylo tu "wszystkich czterech" - to bylo nieaktualne od czasu dodania cennikow
+i wpisow bloga. Zamiast liczyc z pamieci, sprawdz: `grep -l "amico.css" *.html blog/*.html`.
 
 Pominiecie tego kroku daje najbardziej mylacy objaw w projekcie: poprawka jest na dysku, testy
 przechodza, a przegladarka i CDN GitHub Pages nadal serwuja stary CSS. Wyglada to identycznie
