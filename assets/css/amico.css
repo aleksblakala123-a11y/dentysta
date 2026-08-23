@@ -6557,3 +6557,57 @@ summary:focus-visible {
   outline-offset: 2px;
   box-shadow: 0 0 0 2px #ffffff;
 }
+
+/* ===== Reveal engine v4: stan poczatkowy i przejscie =====
+   Zastepuje gsap.fromTo(el, {opacity:0,y:40}, {opacity:1,y:0,duration:.9}).
+   Ten jeden efekt byl jedynym powodem, dla ktorego strona ladowala GSAP.
+   JS tylko dokłada klase .is-widoczny - cala animacja jest tutaj. */
+
+.amico-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.amico-reveal.is-widoczny {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s cubic-bezier(.22, .61, .36, 1),
+              transform .9s cubic-bezier(.22, .61, .36, 1);
+}
+
+/* Przy ograniczonym ruchu tresc jest widoczna od razu - nie chowamy jej
+   i nie animujemy. Globalna regula ponizej i tak scina transition-duration,
+   ale bez tego elementy zostalyby na opacity 0. */
+@media (prefers-reduced-motion: reduce) {
+  .amico-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .amico-reveal.is-widoczny {
+    transition: none;
+  }
+}
+
+/* ===== Zwijanie odpowiedzi FAQ bez webflow.js =====
+   Wczesniej stan zamkniety wymuszal modul tabs Webflow, wpisujac INLINE
+   height:0px na .faq_description. Po jego usunieciu zostal sam CSS
+   z grid-template-rows: 0fr - i okazalo sie, ze on nigdy nie zwijal.
+
+   Dwa powody, oba zmierzone:
+   1) Sciezka `fr` ma automatyczne minimum min-content, wiec 0fr nie schodzi
+      do zera. Po dodaniu min-height:0 na elemencie siatki: 103px -> 10px.
+   2) Zostajace 10 px to padding-top wnetrza - minimum go nie dotyczy.
+      Stad zerowanie paddingu w stanie zamknietym.
+   Razem: 103px -> 0px, a otwieranie i zamykanie znowu animuje sie plynnie.
+
+   Zmiana padding jest niewidoczna, bo dzieje sie wewnatrz pudelka
+   o zerowej wysokosci z overflow:hidden. */
+
+.faq-description_inner {
+  min-height: 0;
+}
+
+.faq_description:not(.is-open) .faq-description_inner {
+  padding-top: 0;
+}

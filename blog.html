@@ -50,7 +50,8 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260823h" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260823j" rel="stylesheet" type="text/css"/>
+        <noscript><style>[data-w-id]{opacity:1!important;transform:none!important;}</style></noscript>
         <script type="text/javascript">
             !function(o, c) {
                 var n = c.documentElement
@@ -71,7 +72,7 @@
                         <img loading="eager" src="assets/img/amico-logo-dark.svg" width="156" height="34" alt="Amico logo" class="logo_image"/>
                     </a>
                     <div class="navbar-content_wrap">
-                        <nav role="navigation" class="navbar_menu w-nav-menu">
+                        <nav role="navigation" id="navbar-menu" class="navbar_menu w-nav-menu">
                             <a href="index.html" class="navbar_link w-inline-block">
                                 <div>Strona główna</div>
                             </a>
@@ -715,65 +716,89 @@
                 </div>
             </footer>
         </div>
-        <script src="assets/js/jquery-3.5.1.min.js" type="text/javascript"></script>
-        <script src="assets/js/webflow.schunk.36b8fb49256177c8.js" type="text/javascript"></script>
-        <script src="assets/js/webflow.schunk.5e71080783712679.js" type="text/javascript"></script>
-        <script src="assets/js/webflow.c9187143.3b5f57f78ed8e3cc.js" type="text/javascript"></script>
-        <script src="assets/js/gsap.min.js" type="text/javascript"></script>
         <script>
-            /* Amico reveal engine v3, fade/slide reveals via IntersectionObserver.
-               Elementy zbierane RAZ na starcie ([data-w-id] z inline opacity:0),
-               kazdy obserwowany do pierwszego pokazania, potem odpiety. Zaden pelny
-               skan document.querySelectorAll('*') - to on powodowal dlugie taski. */
+            /* ===== Amico reveal engine v4, bez GSAP =====
+               v3 animowal przez gsap.fromTo, wiec dla jednego efektu fade+slide
+               ladowala sie cala biblioteka: 28 KB transferu, 71 KB rozpakowane.
+               Teraz robi to CSS transition, a JS tylko przelacza klase.
+
+               PRZY OKAZJI NAPRAWIONA MARTWA SIATKA BEZPIECZENSTWA.
+               v3 mial fallback po 3 s, ktory szukal [data-w-id][style*="opacity:0"].
+               Nigdy nie zadzialal: gsap.set(els, {clearProps:...}) na starcie
+               przepisywal inline style z webflowowego `opacity:0` na gsapowe
+               `opacity: 0` - ze spacja - wiec selektor przestawal pasowac.
+               Zmierzone na produkcji 4,5 s po zaladowaniu, bez scrollowania:
+               selektor siatki 0 trafien, ten sam ze spacja 30 trafien,
+               faktycznie ukrytych 30 elementow.
+               Przy powolnym scrollu nie bylo tego widac, bo IntersectionObserver
+               zdazal. Bolalo przy skoku do kotwicy, Ctrl+End, przywroconej
+               pozycji scrolla i powrocie "wstecz" - realna tresc (CTA "Umow
+               wizyte", sekcja "5 Specjalistow") zostawala niewidoczna na stale.
+
+               v4 trzyma liste elementow w zmiennej `els` i siatka chodzi po niej,
+               a nie po selektorze tekstowym. Strukturalnie nie ma sie jak rozjechac,
+               bo nikt juz nie przepisuje inline styli.
+
+               Opoznienie 150 ms zostaje z v3: Webflow IX2 dokłada inline opacity:0
+               po starcie strony, wiec zbieranie elementow od razu by ich nie zlapalo. */
             (function () {
-                function isExcluded(el) {
+                function wykluczony(el) {
                     return el.closest('.navbar_wrap') || el.closest('.w-nav') || el.closest('.w-dropdown-list');
                 }
 
-                function reveal(el) {
-                    gsap.fromTo(el,
-                        { opacity: 0, y: 40 },
-                        { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' }
+                function start() {
+                    var els = Array.prototype.filter.call(
+                        document.querySelectorAll('[data-w-id]'),
+                        function (el) {
+                            var st = el.getAttribute('style') || '';
+                            /* tolerujemy oba zapisy: opacity:0 i opacity: 0 */
+                            return /opacity\s*:\s*0\s*(;|$)/.test(st) && !wykluczony(el);
+                        }
                     );
-                }
-
-                function initReveals() {
-                    if (!window.gsap) return;
-                    var els = Array.prototype.slice.call(
-                        document.querySelectorAll('[data-w-id][style*="opacity:0"]')
-                    ).filter(function (el) { return !isExcluded(el); });
                     if (!els.length) return;
 
-                    gsap.set(els, { clearProps: 'transform,filter' });
+                    els.forEach(function (el) {
+                        /* Webflow zostawil inline transform i opacity. Kasujemy je,
+                           zeby stan poczatkowy definiowala wylacznie klasa CSS. */
+                        el.style.removeProperty('opacity');
+                        el.style.removeProperty('transform');
+                        el.style.removeProperty('-webkit-transform');
+                        el.style.removeProperty('-moz-transform');
+                        el.style.removeProperty('-ms-transform');
+                        el.style.removeProperty('filter');
+                        el.classList.add('amico-reveal');
+                    });
+
+                    function pokaz(el) { el.classList.add('is-widoczny'); }
 
                     if (!('IntersectionObserver' in window)) {
-                        els.forEach(reveal);
+                        els.forEach(pokaz);
                         return;
                     }
 
-                    var observer = new IntersectionObserver(function (entries) {
-                        entries.forEach(function (entry) {
-                            if (!entry.isIntersecting) return;
-                            reveal(entry.target);
-                            observer.unobserve(entry.target);
+                    var obs = new IntersectionObserver(function (entries) {
+                        entries.forEach(function (e) {
+                            if (!e.isIntersecting) return;
+                            pokaz(e.target);
+                            obs.unobserve(e.target);
                         });
                     }, { threshold: 0, rootMargin: '0px 0px -3% 0px' });
 
-                    els.forEach(function (el) { observer.observe(el); });
+                    els.forEach(function (el) { obs.observe(el); });
 
-                    /* Safety net: pojedynczy przebieg po 3s, skanuje wylacznie
-                       [data-w-id][style*="opacity:0"] (nigdy '*'), na wypadek gdyby
-                       IntersectionObserver z jakiegos powodu nie odpalil dla ktoregos elementu. */
                     setTimeout(function () {
-                        var stillHidden = document.querySelectorAll('[data-w-id][style*="opacity:0"]');
-                        stillHidden.forEach(function (el) {
-                            if (isExcluded(el)) return;
-                            gsap.set(el, { opacity: 1, y: 0, clearProps: 'transform,filter' });
+                        els.forEach(function (el) {
+                            if (!el.classList.contains('is-widoczny')) pokaz(el);
                         });
+                        obs.disconnect();
                     }, 3000);
                 }
-                if (document.readyState !== 'loading') setTimeout(initReveals, 150);
-                else document.addEventListener('DOMContentLoaded', function () { setTimeout(initReveals, 150); });
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 150); });
+                } else {
+                    setTimeout(start, 150);
+                }
             })();
         </script>
         <script>
@@ -935,6 +960,148 @@
     toggler.focus();
   });
 
+})();
+</script>
+<script>
+/* Menu mobilne bez webflow.js.
+   Strona artykulu nie laduje jQuery ani Webflow (to razem ~179 KB po gzipie
+   na stronie, ktora jest samym tekstem), a menu obslugiwal wlasnie webflow.js.
+   Ten skrypt odtwarza DOKLADNIE te zmiany w DOM, na ktorych opiera sie CSS,
+   i nic ponadto:
+
+     - `.w--open` na przycisku  -> blokada przewijania tla (`html:has(...)`),
+                                   stan hamburgera, hak dla pulapki fokusu;
+     - `.w-nav-overlay` w srodku `.navbar_wrap` -> warstwa panelu;
+     - `data-nav-menu-open` na `<nav>` -> `display:block !important` i pozycja.
+
+   Czego NIE odtwarzamy i dlaczego dobrze:
+   webflow.js przechwytywal linki-kotwice (`preventDefault` + wlasne przewijanie)
+   i przez to gubil natywne przeniesienie fokusu - stad na pozostalych stronach
+   osobna lata na skip link. Tutaj kotwice (skip link, spis tresci) dzialaja
+   natywnie, razem z przeniesieniem fokusu na `<main tabindex="-1">`.
+
+   Wysokosc overlayu ustawia CSS. Webflow wpisywal tu inline wysokosc calego
+   dokumentu, co przy pasku `position:fixed` rozciagalo warstwe daleko pod ekran
+   i wymagalo `!important` w arkuszu. My po prostu tego nie wpisujemy. */
+(function () {
+  var nav = document.querySelector('.navbar_wrap');
+  var przycisk = document.querySelector('.navbar-toggler-button');
+  var menu = document.getElementById('navbar-menu');
+  if (!nav || !przycisk || !menu) return;
+
+  /* Zapamietane miejsce panelu w DOM. Przy zamykaniu wraca dokladnie tam,
+     skad go zabralismy - inaczej po kilku otwarciach kolejnosc elementow
+     w pasku zaczelaby sie rozjezdzac. */
+  var rodzic = menu.parentNode;
+  var nastepny = menu.nextSibling;
+  var overlay = null;
+
+  function otwarte() { return przycisk.classList.contains('w--open'); }
+
+  function otworz() {
+    if (otwarte()) return;
+    overlay = document.createElement('div');
+    overlay.className = 'w-nav-overlay';
+    overlay.setAttribute('data-wf-ignore', '');
+    overlay.style.display = 'block';
+    nav.appendChild(overlay);
+    overlay.appendChild(menu);
+    menu.setAttribute('data-nav-menu-open', '');
+    przycisk.classList.add('w--open');
+    przycisk.setAttribute('aria-expanded', 'true');
+    przycisk.setAttribute('aria-label', 'Zamknij menu');
+  }
+
+  function zamknij(wrocFokusem) {
+    if (!otwarte()) return;
+    menu.removeAttribute('data-nav-menu-open');
+    rodzic.insertBefore(menu, nastepny);
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    overlay = null;
+    przycisk.classList.remove('w--open');
+    przycisk.setAttribute('aria-expanded', 'false');
+    przycisk.setAttribute('aria-label', 'Otwórz menu');
+    if (wrocFokusem) przycisk.focus();
+  }
+
+  przycisk.addEventListener('click', function () {
+    if (otwarte()) zamknij(false); else otworz();
+  });
+
+  // Klikniecie w link zamyka panel - inaczej po powrocie z kotwicy zostalby otwarty.
+  menu.addEventListener('click', function (e) {
+    if (e.target.closest('a')) zamknij(false);
+  });
+
+  /* Escape z fokusem W PASKU. Przypadek "fokus poza nawigacja" domyka juz
+     skrypt pulapki fokusu wyzej (wola przycisk.click()), wiec tutaj go
+     pomijamy - inaczej menu przelaczyloby sie dwa razy i zostalo otwarte. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !otwarte()) return;
+    if (!document.activeElement || !document.activeElement.closest('.navbar_wrap')) return;
+    zamknij(true);
+  });
+
+  /* Po przejsciu na szerokosc desktopowa hamburger znika. Gdyby panel zostal
+     otwarty, `html { overflow: hidden }` zablokowaloby przewijanie calej
+     strony bez zadnego widocznego powodu. */
+  window.addEventListener('resize', function () {
+    if (otwarte() && window.innerWidth > 991) zamknij(false);
+  });
+})();
+</script>
+<script>
+/* Akordeon FAQ bez webflow.js.
+   Wczesniej robil to modul "tabs" Webflow: przelaczal .w--current na linku,
+   a animacje otwierania wpisywal INLINE (height:0px na .faq_description plus
+   opacity/scale na .faq-description_inner). Piec elementow .w-tab-pane, ktore
+   ten modul obsluguje, jest w markupie CALKOWICIE PUSTYCH - cala tresc odpowiedzi
+   siedzi w srodku linku. Czyli z calego modulu wykorzystywano wylacznie
+   "jeden otwarty naraz".
+
+   Tutaj to samo robi klasa .is-open na .faq_description, a zwijanie liczy CSS
+   (grid-template-rows: 0fr -> 1fr). Ta sama mechanika dziala juz na service.html,
+   wiec nie wprowadzamy nowego wzorca, tylko domykamy istniejacy.
+
+   Przy okazji linki dostaja aria-expanded - modul Webflow go nie ustawial,
+   wiec czytnik ekranu nie mial skad wiedziec, ze to rozwijana tresc. */
+(function () {
+  var items = Array.prototype.slice.call(document.querySelectorAll('.faq_item'));
+  if (!items.length) return;
+
+  function panelOf(el) { return el.querySelector('.faq_description'); }
+
+  function zamknijWszystkie() {
+    items.forEach(function (el) {
+      var p = panelOf(el);
+      if (p) p.classList.remove('is-open');
+      el.classList.remove('w--current');
+      el.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  items.forEach(function (el) {
+    var panel = panelOf(el);
+    if (!panel) return;
+
+    /* Stan poczatkowy bierzemy z markupu - pierwszy element ma .w--current. */
+    var otwarty = el.classList.contains('w--current');
+    panel.classList.toggle('is-open', otwarty);
+    el.setAttribute('aria-expanded', otwarty ? 'true' : 'false');
+
+    el.addEventListener('click', function (e) {
+      /* Link prowadzi do #w-tabs-... - bez tego przegladarka skakalaby
+         do pustego .w-tab-pane i gubila pozycje na stronie. */
+      e.preventDefault();
+      var bylOtwarty = panel.classList.contains('is-open');
+      zamknijWszystkie();
+      if (!bylOtwarty) {
+        panel.classList.add('is-open');
+        el.classList.add('w--current');
+        el.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
 })();
 </script>
 </body>
