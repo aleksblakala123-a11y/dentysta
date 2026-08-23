@@ -6440,3 +6440,57 @@ button.navbar-toggler-button {
   -webkit-text-fill-color: currentColor;
   color: #ffffff;
 }
+
+/* ===== Cele dotykowe poza artykulami (WCAG 2.5.8) =====
+   Uzupelnienie tego, co juz zrobiono wyzej dla stron artykulow
+   (.article-breadcrumb / .article-toc) i dla hamburgera.
+
+   UWAGA METODOLOGICZNA: audyt zglosil tu 14 elementow, w tym hamburger 24x18
+   i "linki nawigacji 164x24". Oba byly bledami pomiaru:
+   - hamburger MA juz cel 44x44 przez ::after (regula w @media max-width:991px).
+     getBoundingClientRect() nie widzi obszaru pseudo-elementu; sprawdzony
+     elementFromPoint daje 43x43, czyli pudelko 44x44 minus zaokraglenie.
+   - "linki nawigacji 164x24" to byly linki STOPKI. Linki menu mobilnego maja
+     juz min-height:48px i zmierzone 343x48.
+   Zostaje wylacznie WYSOKOSC ponizej progu - szerokosci sa tu wszedzie
+   powyzej 148 px, wiec ruszamy tylko padding w pionie. */
+
+/* Logo w pasku: 28 -> 44. Pasek ma 50 px, wiec jego wysokosc sie nie zmienia. */
+.navbar_logo {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Stopka: linki mialy 24 px. Padding dodaje 20, a gap schodzi z 8 do 0 -
+   inaczej odstep miedzy tekstami skoczylby z 8 na 28 px i stopka by sie rozdela.
+   Netto: tekst od tekstu 20 px zamiast 8, cel dotykowy 44. */
+.footer-menu_link-wrap {
+  grid-row-gap: 0;
+  row-gap: 0;
+}
+
+.footer-menu_link {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* Logo w stopce: 34 -> 44 */
+.footer_brand {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+/* Nazwiska lekarzy: 27 -> 45. Karta ma stale 500 px i justify-content:flex-end,
+   wiec tresc rosnie w gore i nie rozpycha kafla. */
+.team-menmber_wrap {
+  display: block;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+/* "Albo otworz od razu w Google Maps": 31 -> 45. Zmierzony odstep od przycisku
+   wyzej to 14 px, wiec po dodaniu 7 px u gory zostaje 7 px czystej przerwy. */
+.mapa-placeholder_alt a {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
