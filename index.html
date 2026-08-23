@@ -1556,53 +1556,6 @@
         <script src="assets/js/webflow.schunk.5e71080783712679.js" type="text/javascript"></script>
         <script src="assets/js/webflow.c9187143.3b5f57f78ed8e3cc.js" type="text/javascript"></script>
         <script src="assets/js/gsap.min.js" type="text/javascript"></script>
-        <script src="assets/js/SplitText.min.js" type="text/javascript"></script>
-        <script src="assets/js/ScrollTrigger.min.js" type="text/javascript"></script>
-        <script>
-
-            gsap.registerPlugin(ScrollTrigger);
-
-            document.addEventListener("DOMContentLoaded", () => {
-
-                initCounterAnimations();
-            }
-            );
-
-            /* ========== GSAP COUNTER ========== */
-            function initCounterAnimations() {
-                const counters = document.querySelectorAll(".about-hero_info-item_title");
-
-                counters.forEach( (counter) => {
-                    const targetText = counter.textContent.trim();
-                    const targetNumber = parseFloat(targetText.replace(/[^\d.]/g, "")) || 0;
-                    const suffix = targetText.replace(/[\d.,\s]/g, "");
-
-                    // Start from 0
-                    gsap.set(counter, {
-                        innerText: 0
-                    });
-
-                    gsap.to(counter, {
-                        innerText: targetNumber,
-                        duration: 3.5,
-                        ease: "power2.out",
-                        snap: {
-                            innerText: 1
-                        },
-                        scrollTrigger: {
-                            trigger: counter,
-                            start: "top 85%",
-                            toggleActions: "play none none reset"
-                        },
-                        onUpdate: function() {
-                            const value = Math.ceil(this.targets()[0].innerText);
-                            counter.innerText = value.toLocaleString("en-US") + suffix;
-                        }
-                    });
-                }
-                );
-            }
-        </script>
         <script>
             /* Amico reveal engine v3, fade/slide reveals via IntersectionObserver.
                Elementy zbierane RAZ na starcie ([data-w-id] z inline opacity:0),
