@@ -6379,3 +6379,23 @@ button.navbar-toggler-button {
     font-weight: 600;
   }
 }
+
+/* ===== Karty lekarzy: gotowosc na zdjecia =====
+   Karty pokazuja kolka z inicjalami (.team-avatar_placeholder), bo gabinet
+   nie dostarczyl jeszcze zdjec. Zdjec stockowych tu nie podstawiamy - na stronie
+   "poznaj naszych lekarzy" obca twarz wprowadza pacjenta w blad co do tego,
+   kto go bedzie leczyl.
+   Ta klasa jest przygotowana tak, zeby podmiana byla czysta: <picture> wchodzi
+   dokladnie w ten sam box co placeholder (.image-animation-scale, 100% x 100%),
+   wiec nie trzeba ruszac ani layoutu, ani animacji hover.
+   Wzorzec do wklejenia jest w komentarzu przy pierwszej karcie w about.html. */
+
+.team-avatar_foto {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  /* Kadr portretowy: lekki bias ku gorze, zeby przyciecie szlo po tulowiu,
+     a nie po brodzie. */
+  object-position: center 20%;
+}
