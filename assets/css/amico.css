@@ -2540,7 +2540,7 @@ figure {
 }
 
 .section_testimonial.is-home {
-  background-image: url("../img/69ddd539a343355970d2be89_testimonial-background.webp");
+  background-image: url("../img/testimonial-background.webp");
   background-position: 50% 100%;
   background-size: cover;
 }
@@ -4427,7 +4427,7 @@ figure {
   }
 
   .hero-image_wrap {
-    background-image: url("../img/69f5e19b42acf37c98906a5c_home-hero-mobile-image.webp");
+    background-image: url("../img/home-hero-mobile-image.webp");
     background-position: 100% 0;
     background-repeat: no-repeat;
     background-size: contain;
@@ -6214,10 +6214,10 @@ button.navbar-toggler-button {
    pokrywaja sie z breakpointami reszty arkusza. ===== */
 
 .section_testimonial.is-home {
-  background-image: url('../img/opt/69ddd539a343355970d2be89_testimonial-background-800w.webp') !important;
+  background-image: url('../img/opt/testimonial-background-800w.webp') !important;
   background-image: image-set(
-    url('../img/opt/69ddd539a343355970d2be89_testimonial-background-400w.webp') 1x,
-    url('../img/opt/69ddd539a343355970d2be89_testimonial-background-800w.webp') 2x
+    url('../img/opt/testimonial-background-400w.webp') 1x,
+    url('../img/opt/testimonial-background-800w.webp') 2x
   ) !important;
 }
 
@@ -6231,10 +6231,10 @@ button.navbar-toggler-button {
 
 @media screen and (min-width: 768px) {
   .section_testimonial.is-home {
-    background-image: url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1200w.webp') !important;
+    background-image: url('../img/opt/testimonial-background-1200w.webp') !important;
     background-image: image-set(
-      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-800w.webp') 1x,
-      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1600w.webp') 2x
+      url('../img/opt/testimonial-background-800w.webp') 1x,
+      url('../img/opt/testimonial-background-1600w.webp') 2x
     ) !important;
   }
 
@@ -6249,10 +6249,10 @@ button.navbar-toggler-button {
 
 @media screen and (min-width: 1200px) {
   .section_testimonial.is-home {
-    background-image: url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1600w.webp') !important;
+    background-image: url('../img/opt/testimonial-background-1600w.webp') !important;
     background-image: image-set(
-      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1200w.webp') 1x,
-      url('../img/opt/69ddd539a343355970d2be89_testimonial-background-1600w.webp') 2x
+      url('../img/opt/testimonial-background-1200w.webp') 1x,
+      url('../img/opt/testimonial-background-1600w.webp') 2x
     ) !important;
   }
 
