@@ -6264,3 +6264,118 @@ button.navbar-toggler-button {
     ) !important;
   }
 }
+
+/* ===== Godziny otwarcia w sekcji lokalizacji =====
+   Bylo: godziny istnialy WYLACZNIE w JSON-LD. Regex \d{1,2}[:.]\d{2} na calym
+   document.body.innerText dawal 0 trafien - czyli Google je widzial, a pacjent nie.
+   Strona twierdzila "6 dni w tygodniu", nie mowiac ktorych ani od ktorej.
+   Wartosci sa przepisane 1:1 z openingHoursSpecification w naglowku about.html.
+
+   Karta jest w .location_header, ktory ma text-align:center - stad jawny
+   text-align:left w srodku, zeby wykaz czytalo sie jak wykaz, a nie jak akapit.
+   Godziny nie sa duplikowane w JS: skrypt statusu czyta je z atrybutow data-*,
+   wiec nie da sie rozjechac tabeli ze skryptem. */
+
+.godziny_wrap {
+  width: 100%;
+  max-width: 420px;
+  margin: 32px auto 0;
+  padding: 20px 24px;
+  border: 1px solid var(--primitive-color--neutral-300);
+  border-radius: var(--_size-variables---border-radius--xl);
+  background-color: var(--primitive-color--neutral-0);
+  text-align: left;
+}
+
+.godziny_naglowek {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--primitive-color--primary-900);
+}
+
+.godziny {
+  margin: 0;
+}
+
+.godziny_wiersz {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: var(--_size-variables---border-radius--md);
+}
+
+.godziny_wiersz + .godziny_wiersz {
+  margin-top: 2px;
+}
+
+/* dd ma w UA margin-inline-start: 40px - bez tego zakres ucieka w prawo */
+.godziny_dzien,
+.godziny_zakres {
+  margin: 0;
+}
+
+.godziny_dzien {
+  color: var(--primitive-color--gray-800);
+  font-size: .95rem;
+}
+
+.godziny_zakres {
+  color: var(--primitive-color--primary-900);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.godziny_wiersz.is-dzisiaj {
+  background-color: var(--primitive-color--neutral-200);
+}
+
+.godziny_wiersz.is-dzisiaj .godziny_dzien {
+  color: var(--primitive-color--primary-900);
+  font-weight: 600;
+}
+
+.godziny_wiersz.is-dzisiaj .godziny_zakres {
+  font-weight: 600;
+}
+
+.godziny_status {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--primitive-color--neutral-300);
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--primitive-color--primary-700);
+}
+
+/* Kropka jest wylacznie dodatkiem - stan "otwarte/zamkniete" jest zawsze
+   napisany slowami, wiec nie polegamy na samym kolorze. */
+.godziny_status.is-otwarte::before {
+  content: "";
+  display: inline-block;
+  width: .5em;
+  height: .5em;
+  margin-right: .5em;
+  border-radius: 50%;
+  background-color: #1b7a3d;
+  vertical-align: middle;
+}
+
+/* Ponizej ~400px "Poniedzialek - piatek" i zakres nie mieszcza sie obok siebie,
+   wiec wiersz sie rozklada na dwie linie zamiast lamac etykiete w polowie frazy. */
+@media (max-width: 400px) {
+  .godziny_wrap {
+    padding: 16px;
+  }
+
+  .godziny_wiersz {
+    grid-template-columns: 1fr;
+  }
+
+  .godziny_zakres {
+    font-weight: 600;
+  }
+}

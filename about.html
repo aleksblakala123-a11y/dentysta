@@ -50,7 +50,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260821m" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260823a" rel="stylesheet" type="text/css"/>
         <style>
 
         </style>
@@ -516,6 +516,23 @@
                                         </div>
                                         <div class="location-header_para-wrap">
                                             <p class="location-header_para">ul. Bronisława Ratajczaka 9/20/21, 21-040 Świdnik</p>
+                                        </div>
+                                        <div class="godziny_wrap">
+                                            <h3 class="godziny_naglowek">Godziny otwarcia</h3>
+                                            <dl class="godziny">
+                                                <div class="godziny_wiersz" data-dni="1-5" data-od="09:00" data-do="19:00">
+                                                    <dt class="godziny_dzien">Poniedziałek – piątek</dt>
+                                                    <dd class="godziny_zakres">09:00 – 19:00</dd>
+                                                </div>
+                                                <div class="godziny_wiersz" data-dni="6" data-od="09:00" data-do="14:00">
+                                                    <dt class="godziny_dzien">Sobota</dt>
+                                                    <dd class="godziny_zakres">09:00 – 14:00</dd>
+                                                </div>
+                                                <div class="godziny_wiersz" data-dni="0">
+                                                    <dt class="godziny_dzien">Niedziela</dt>
+                                                    <dd class="godziny_zakres">nieczynne</dd>
+                                                </div>
+                                            </dl>
                                         </div>
                                     </div>
                                 </div>
@@ -1034,6 +1051,92 @@
     ramka.setAttribute('tabindex', '-1');
     ramka.focus({ preventScroll: true });
   });
+})();
+</script>
+<script>
+/* ===== Godziny otwarcia: status "dzis czynne do ..." =====
+   Sam wykaz godzin jest w HTML i jest kompletny bez JS - ten skrypt tylko
+   dokleja jedno zdanie o dzisiejszym dniu i podswietla wlasciwy wiersz.
+   Zrodlem prawdy sa atrybuty data-* w HTML, nie stale w JS: godziny sa
+   zapisane w jednym miejscu, wiec nie da sie ich rozjechac miedzy tabela
+   a skryptem.
+   Czas liczony w Europe/Warsaw przez Intl, nie z lokalnego zegara
+   odwiedzajacego - inaczej pacjent z innej strefy zobaczylby zla informacje. */
+(function () {
+  var wrap = document.querySelector('.godziny_wrap');
+  if (!wrap) return;
+
+  var wiersze = wrap.querySelectorAll('.godziny_wiersz');
+  if (!wiersze.length) return;
+
+  function terazWWarszawie() {
+    try {
+      var czesci = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Warsaw',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(new Date());
+
+      var mapa = {};
+      for (var i = 0; i < czesci.length; i++) mapa[czesci[i].type] = czesci[i].value;
+
+      var dni = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      var dzien = dni[mapa.weekday];
+      var h = parseInt(mapa.hour, 10);
+      var m = parseInt(mapa.minute, 10);
+      if (dzien === undefined || isNaN(h) || isNaN(m)) return null;
+
+      return { dzien: dzien, minuty: h * 60 + m };
+    } catch (e) {
+      return null; /* brak Intl albo bazy stref - zostaje sam wykaz, bez statusu */
+    }
+  }
+
+  function naMinuty(hhmm) {
+    var cz = String(hhmm).split(':');
+    var h = parseInt(cz[0], 10), m = parseInt(cz[1], 10);
+    return (isNaN(h) || isNaN(m)) ? null : h * 60 + m;
+  }
+
+  function pasuje(zakresDni, dzien) {
+    var cz = String(zakresDni).split('-');
+    var od = parseInt(cz[0], 10);
+    var doo = cz.length > 1 ? parseInt(cz[1], 10) : od;
+    return dzien >= od && dzien <= doo;
+  }
+
+  var teraz = terazWWarszawie();
+  if (!teraz) return;
+
+  var dzisiaj = null;
+  for (var i = 0; i < wiersze.length; i++) {
+    if (pasuje(wiersze[i].getAttribute('data-dni'), teraz.dzien)) { dzisiaj = wiersze[i]; break; }
+  }
+  if (!dzisiaj) return;
+
+  dzisiaj.classList.add('is-dzisiaj');
+
+  var od = naMinuty(dzisiaj.getAttribute('data-od'));
+  var doo = naMinuty(dzisiaj.getAttribute('data-do'));
+  var tekst, otwarte = false;
+
+  if (od === null || doo === null) {
+    tekst = 'Dziś nieczynne';
+  } else if (teraz.minuty < od) {
+    tekst = 'Dziś otwieramy o ' + dzisiaj.getAttribute('data-od');
+  } else if (teraz.minuty < doo) {
+    tekst = 'Teraz otwarte, dziś do ' + dzisiaj.getAttribute('data-do');
+    otwarte = true;
+  } else {
+    tekst = 'Dziś już zamknięte';
+  }
+
+  var p = document.createElement('p');
+  p.className = 'godziny_status' + (otwarte ? ' is-otwarte' : '');
+  p.textContent = tekst;
+  wrap.appendChild(p);
 })();
 </script>
 </body>
