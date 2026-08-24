@@ -1061,3 +1061,68 @@ mialo byc naprawde niedostepne dla postronnych, trzeba by innego mechanizmu
 4. Potwierdzic parserem, ze zapytanie o `meta[name="robots"]` zwraca `null` na
    wszystkich stronach.
 5. Dopiero potem zglaszac witryne w Google Search Console.
+
+## 2026-08-24 - Trzy dlugi z audytu porownawczego: obrazy, CSS, strony prawne
+
+Domkniecie tego, co bylo w moim zasiegu po porownaniu demo z amicodental.pl.
+Zdjecia personelu i opisy siedmiu zabiegow zostaja otwarte - nie odblokuje ich kod.
+
+### 1. Rekompresja wariantow WebP  (-480 KB, -27%)
+
+64 serwowane warianty przekodowane z plikow zrodlowych w `assets/img`, q74,
+`effort 6`, skalowanie `lanczos3`. Zrodlem jest zawsze oryginal, wiec nie ma
+straty pokoleniowej - obecne `.webp` powstaly z tych samych `.jpg`.
+Zapis tylko wtedy, gdy nowy plik jest faktycznie mniejszy.
+
+Kadry `lekarz-*` **pominiete swiadomie**: ich zrodlem jest juz przetworzony plik
+400x533, wiec wariant 800w bylby powiekszeniem, a nie ostrzejszym obrazem.
+
+```
+katalog opt:  1759 KB -> 1279 KB
+index.html:    564 KB ->  480 KB  (te same 13 zapytan)
+obrazy:        311 KB ->  232 KB
+```
+
+### 2. Reguly bez pokrycia w markupie  (212 KB -> 200 KB)
+
+**Sprostowanie do wlasnego audytu.** Napisalem, ze arkusz to w wiekszosci martwy
+kod po Webflow. Policzone: **martwych regul bylo 5,6%**, nie wiekszosc.
+Reszta jest realnie uzywana. To nie smiec do wyrzucenia, tylko rozwlekly styl
+generowania Webflow - pelne, niedzielone deklaracje na kazdy komponent i kazdy
+z czterech progow. Zejscie ponizej 60 KB wymaga przepisania arkusza od zera.
+
+Kryterium: selektor jest martwy tylko wtedy, gdy ktorejs z jego klas nie ma ani
+w markupie 27 stron, ani wsrod klas dokladanych przez skrypty. Przy watpliwosci
+zostaje. Klasy z JS wyciagane **automatycznie** z `className=` oraz
+`classList.add|toggle|remove(` - recznie pisana lista raz zawiodla, zabraklo
+`.godziny_status`, regula wypadla i karta godzin skurczyla sie z 242 na 217 px.
+Zlapane dopiero porownaniem geometrii, nie okiem.
+
+```
+usuniete:   63 reguly + 80 linii nieuzywanych zmiennych
+arkusz:     212 KB -> 200 KB   (gzip 42 KB -> 39 KB)
+geometria:  15 elementow przed i po -> 0 roznic
+przeglad:   15 typow stron -> 0 poziomego przewijania, 0 zgaszonych elementow
+```
+
+Sprawdzone `opacity: 0` na index i blog to **nie** skutek czyszczenia: trzy
+nieaktywne klatki karuzeli hero i CTA kart bloga pokazywane na hover.
+
+Podbite `?v=` do `20260824e` w 27 plikach.
+
+### 3. Metadane czterech stron prawnych
+
+`privacy`, `terms`, `cookies` i `404` mialy tylko `title`, `description`
+i `robots` - maja wlasny, wbudowany CSS, wiec wypadly z kazdego usprawnienia
+SEO z ostatnich dni. Dostaly Open Graph i dane strukturalne.
+
+`404` **celowo bez `canonical`** i bez wpisu w sitemapie: strona bledu jest
+serwowana pod wieloma adresami i nie powinna deklarowac adresu kanonicznego.
+Jej naglowek stoi w jednej linii bez wciec, wiec wymagal osobnych kotwic
+w skrypcie - wspolne kotwice dla pozostalej trojki na niej nie lapaly.
+
+```
+privacy / terms / cookies:  +canonical  +OG(6)  +WebPage+BreadcrumbList
+404:                        bez canonical  +OG(5)  +WebPage
+sitemap:                    30 wpisow, komplet poza 404
+```
