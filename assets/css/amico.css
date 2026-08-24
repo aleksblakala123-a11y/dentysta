@@ -6968,3 +6968,93 @@ html:has(.w-nav-button.w--open) .cta-mobilne {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* ===== Profile zespolu =====
+   Szesc osobnych adresow, po jednym na osobe - tak jak podstrony zabiegow.
+   Przy okazji rozwiazuje to problem zgloszony wczesniej: karty na "O nas"
+   mialy po dwa linki prowadzace do about.html, czyli same do siebie.
+
+   Zdjecia maja tylko wlasciciele - to jedyne, jakie gabinet udostepnia.
+   Pozostale cztery osoby dostaja inicjaly w kole marki. Zaden stock. */
+
+.profil_glowka {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--primitive-color--neutral-300);
+}
+
+@media (min-width: 600px) {
+  .profil_glowka {
+    grid-template-columns: 260px 1fr;
+    gap: 32px;
+  }
+}
+
+.profil_portret {
+  width: 100%;
+  max-width: 260px;
+}
+
+.profil_foto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  /* Kadr jest juz ustawiony w samym pliku - twarz siedzi w gornych dwoch
+     trzecich, wiec tutaj nie trzeba nic przesuwac. */
+  object-position: center center;
+  border-radius: var(--_size-variables---border-radius--2xl, 16px);
+  background: var(--primitive-color--neutral-200);
+}
+
+/* Inicjaly zamiast zdjecia: ten sam jezyk wizualny co kola na kartach zespolu,
+   tylko wieksze. Kolo, a nie prostokat 3:4 - zeby bylo widac, ze to swiadomy
+   znak zastepczy, a nie zdjecie, ktore sie nie zaladowalo. */
+.profil_inicjaly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 132px;
+  height: 132px;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--primitive-color--primary-500);
+  color: #ffffff;
+  font-family: var(--_font---font-family--primary, Sora, sans-serif);
+  font-size: 2.4rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.profil_fakty {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profil_fakty > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.profil_fakty dt {
+  font-family: var(--_font---font-family--primary, Sora, sans-serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--primitive-color--gray-600);
+}
+
+.profil_fakty dd {
+  margin: 0;
+  font-size: 16.5px;
+  color: var(--primitive-color--primary-900);
+}

@@ -78,20 +78,34 @@ ale tresc tej polityki powinna zostac sprawdzona pod katem formularza.
 
 ---
 
-## 3. Dane zawodowe lekarzy
+## 3. Biogramy zespolu - do zatwierdzenia
 
-Do uzupelnienia dla kazdego z piatki:
+Szesc profili (`zespol-*.html`) zostalo zbudowanych z **realnych danych ze strony
+gabinetu** (amicodental.pl, sekcja "O NAS"). Nic nie zostalo wymyslone: uczelnie,
+lata dyplomow, specjalizacje, czlonkostwa, stypendia i staze sa przepisane 1:1.
 
-- numer **PWZ** (prawo wykonywania zawodu)
-- uczelnia i rok dyplomu
-- staz pracy
-- jezyki obce, w ktorych przyjmuje
-- szkolenia i certyfikaty warte pokazania
+Poprawione zostaly wylacznie brakujace spacje po kropkach i przecinkach, ktore
+sa bledem w zrodle ("podrozami.Wciaz", "spokoj,ktory").
 
-Potrzebne takze do rozbudowy `Person` w danych strukturalnych - obecnie sa tam
-`name`, `jobTitle` i `image` dla dwoch osob, bo tylko tyle wynika z tresci.
+| Osoba | Rola | Zdjecie |
+|---|---|---|
+| dr n. med. Jacek Majewski | chirurgia, protetyka | jest |
+| lek. stom. Malgorzata Majewska | stomatologia zachowawcza z endodoncja | jest |
+| lek. stom. Julita Kosior | specjalista ortodoncji | inicjaly |
+| lek. stom. Ilona Bednarska | zachowawcza, endodoncja, periodontologia | inicjaly |
+| lek. stom. Anna Galazka-Wojcik | specjalista stomatologii dzieciecej | inicjaly |
+| dypl. hig. Karolina Sprycha | higienistka i asystentka | inicjaly |
 
----
+**TODO: CLIENT CONFIRMATION** - tresc biogramow jest wlasnoscia gabinetu i
+pochodzi z ich strony. Przed uruchomieniem trzeba potwierdzic, ze moze zostac
+uzyta w tej formie, oraz sprawdzic, czy dane sa nadal aktualne - najstarsze
+wpisy moga miec kilka lat (np. "w lutym 2013 uzyskal stopien doktora").
+
+Nadal brakuje i warto dopytac:
+
+- numery **PWZ** (prawo wykonywania zawodu) - w Polsce podnosza wiarygodnosc
+- jezyki obce, w ktorych przyjmuja
+- aktualne szkolenia i certyfikaty z ostatnich lat
 
 ## 4. Tresc podstron zabiegow
 
