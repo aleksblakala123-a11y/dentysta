@@ -49,11 +49,13 @@
                 {
                     "@type": "Person",
                     "name": "dr n. med. Jacek Majewski",
+                    "image": "https://amicodental.pl/assets/img/lekarz-jacek-majewski.jpg",
                     "jobTitle": "Chirurgia, protetyka"
                 },
                 {
                     "@type": "Person",
                     "name": "lek. stom. Małgorzata Majewska",
+                    "image": "https://amicodental.pl/assets/img/lekarz-malgorzata-majewska.jpg",
                     "jobTitle": "Stomatologia zachowawcza z endodoncją"
                 },
                 {
@@ -96,7 +98,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260823m" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260824b" rel="stylesheet" type="text/css"/>
         <noscript><style>[data-w-id]{opacity:1!important;transform:none!important;}</style></noscript>
         <script type="text/javascript">
             !function(o, c) {
@@ -130,6 +132,9 @@
                             </a>
                             <a href="cennik.html" class="navbar_link w-inline-block">
                                 <div>Cennik</div>
+                            </a>
+                            <a href="rezerwacja.html" class="navbar_link w-inline-block">
+                                <div>Zamów wizytę</div>
                             </a>
                             <a href="blog.html" class="navbar_link w-inline-block">
                                 <div>Blog</div>
@@ -432,23 +437,11 @@
                                             <a aria-label="doctor&#x27;s profile" href="about.html" class="team-image_wrap w-inline-block">
                                                 <div class="image-animation-trigger">
                                                     <div class="image-animation-scale">
-                                                        <!-- TODO: CLIENT CONFIRMATION - zdjecie lekarza.
-                                                             Gdy przyjdzie material, podmien caly <div class="team-avatar_placeholder"> ponizej na:
-
-                                                             <picture>
-                                                                 <source type="image/webp" srcset="assets/img/opt/lekarz-jacek-majewski-400w.webp 400w,
-                                                                     assets/img/opt/lekarz-jacek-majewski-800w.webp 800w" sizes="(max-width: 767px) 100vw, 400px"/>
-                                                                 <img src="assets/img/lekarz-jacek-majewski.jpg" alt="dr n. med. Jacek Majewski - chirurgia, protetyka"
-                                                                     width="600" height="800" loading="lazy" class="team-avatar_foto"/>
-                                                             </picture>
-
-                                                             Kadr pionowy 3:4, zrodlo min. 600x800 (box to 373x500 przy 1280 px).
-                                                             Klasa .team-avatar_foto jest juz w amico.css i wypelnia ten sam box co inicjaly.
-                                                             Inicjaly zostaja jako fallback dla lekarzy bez zdjecia - nie usuwaj .team-avatar_placeholder
-                                                             z pozostalych kart. Pelna lista: docs/TODO-materialy-od-klienta.md -->
-                                                        <div class="team-avatar_placeholder" aria-hidden="true">
-                                                            <span class="team-avatar_circle">JM</span>
-                                                        </div>
+                                                        <picture>
+                                                            <source type="image/webp" srcset="assets/img/opt/lekarz-jacek-majewski.webp"/>
+                                                            <img src="assets/img/lekarz-jacek-majewski.jpg" alt="dr n. med. Jacek Majewski, chirurgia i protetyka, Amico Dental Świdnik"
+                                                                width="208" height="278" loading="lazy" class="team-avatar_foto"/>
+                                                        </picture>
                                                     </div>
                                                 </div>
                                             </a>
@@ -467,9 +460,11 @@
                                             <a aria-label="doctor&#x27;s profile" href="about.html" class="team-image_wrap w-inline-block">
                                                 <div class="image-animation-trigger">
                                                     <div class="image-animation-scale">
-                                                        <div class="team-avatar_placeholder" aria-hidden="true">
-                                                            <span class="team-avatar_circle">MM</span>
-                                                        </div>
+                                                        <picture>
+                                                            <source type="image/webp" srcset="assets/img/opt/lekarz-malgorzata-majewska.webp"/>
+                                                            <img src="assets/img/lekarz-malgorzata-majewska.jpg" alt="lek. stom. Małgorzata Majewska, stomatologia zachowawcza z endodoncją, Amico Dental Świdnik"
+                                                                width="208" height="278" loading="lazy" class="team-avatar_foto"/>
+                                                        </picture>
                                                     </div>
                                                 </div>
                                             </a>

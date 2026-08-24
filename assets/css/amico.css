@@ -6739,3 +6739,232 @@ html:has(.w-nav-button.w--open) .cta-mobilne {
 .article-body h3 {
   word-spacing: .1em;
 }
+
+/* ===== Podstrony zabiegow =====
+   Osiem osobnych adresow zamiast jednej zbiorczej strony uslug - kazdy zabieg
+   moze sie pozycjonowac na wlasna fraze, tak jak na starej stronie gabinetu.
+   Uklad dziedziczy po .article-page (ten sam co cennik i wpisy bloga), wiec
+   nie dokladamy nowego szkieletu ani zadnego JS. */
+
+.uslugi-zakres {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+@media (min-width: 560px) {
+  .uslugi-zakres {
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 24px;
+  }
+}
+
+.uslugi-zakres li {
+  position: relative;
+  padding: 11px 0 11px 26px;
+  border-bottom: 1px solid var(--primitive-color--neutral-300);
+  font-size: 17px;
+}
+
+/* Kropka zamiast ptaszka - ptaszek sugerowalby "zrobione", a to jest lista
+   zakresu, nie lista spelnionych warunkow. */
+.uslugi-zakres li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 21px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primitive-color--primary-500);
+}
+
+.uslugi-cennik {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.uslugi-cennik li {
+  padding: 6px 0;
+}
+
+.uslugi-powrot {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--primitive-color--neutral-300);
+}
+
+/* ===== Formularz rezerwacji =====
+   Strona statyczna, wiec formularz sklada wiadomosc i otwiera program pocztowy.
+   Powod, dla ktorego to jest napisane pod przyciskiem, a nie ukryte: pacjent,
+   ktory klika "Zamow wizyte" i nie dostaje potwierdzenia, zaklada ze wyslal.
+   Przed uruchomieniem trzeba podpiac prawdziwy endpoint - patrz komentarz w JS. */
+
+.rezerwacja_form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 520px;
+}
+
+/* display:flex z autorskiego arkusza bije [hidden] z arkusza przegladarki,
+   wiec po wyslaniu formularz nadal bylby widoczny obok potwierdzenia.
+   Zlapane na zrzucie ekranu - sam odczyt form.hidden pokazywal true. */
+.rezerwacja_form[hidden] {
+  display: none;
+}
+
+.rezerwacja_pole {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.rezerwacja_pole label,
+.rezerwacja_zgoda label {
+  font-family: var(--_font---font-family--primary, Sora, sans-serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--primitive-color--primary-900);
+}
+
+.rezerwacja_wym {
+  color: var(--primitive-color--primary-600);
+}
+
+.rezerwacja_opc {
+  font-weight: 400;
+  font-size: 13.5px;
+  color: var(--primitive-color--gray-600);
+}
+
+.rezerwacja_pole input,
+.rezerwacja_pole textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid #e4e8ea;
+  border-radius: 12px;
+  background: #fafcfc;
+  font-family: inherit;
+  font-size: 16px; /* 16 px, zeby iOS nie przybliżal ekranu przy fokusie */
+  color: var(--primitive-color--primary-900);
+  transition: border-color .2s, background .2s;
+}
+
+.rezerwacja_pole textarea {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.5;
+}
+
+.rezerwacja_pole input:hover,
+.rezerwacja_pole textarea:hover {
+  border-color: var(--primitive-color--neutral-400);
+}
+
+.rezerwacja_pole input:focus,
+.rezerwacja_pole textarea:focus {
+  background: #ffffff;
+  border-color: var(--primitive-color--primary-500);
+}
+
+.rezerwacja_pole input[aria-invalid="true"] {
+  border-color: #c0392b;
+}
+
+.rezerwacja_podpowiedz {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--primitive-color--gray-600);
+}
+
+.rezerwacja_blad {
+  margin: 0;
+  font-size: 13.5px;
+  color: #a5342a;
+}
+
+.rezerwacja_zgoda {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.rezerwacja_zgoda input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--primitive-color--primary-600);
+}
+
+.rezerwacja_zgoda label {
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--primitive-color--gray-800);
+}
+
+.rezerwacja_wyslij {
+  align-self: flex-start;
+  min-height: 52px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: var(--_size-variables---border-radius--8xl, 99px);
+  background: var(--primitive-color--primary-900);
+  color: #ffffff;
+  font-family: var(--_font---font-family--primary, Sora, sans-serif);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.rezerwacja_wyslij:hover {
+  background: var(--primitive-color--primary-700);
+}
+
+.rezerwacja_nota {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--primitive-color--gray-600);
+  max-width: 520px;
+}
+
+.rezerwacja_potwierdzenie {
+  max-width: 520px;
+  padding: 26px 28px;
+  border: 1px solid var(--primitive-color--neutral-300);
+  border-left: 3px solid var(--primitive-color--primary-500);
+  border-radius: var(--_size-variables---border-radius--xl, 12px);
+  background: var(--primitive-color--neutral-200);
+}
+
+.rezerwacja_potwierdzenie h2 {
+  margin: 0 0 10px;
+  font-size: 21px;
+}
+
+.rezerwacja_potwierdzenie p {
+  margin: 0 0 10px;
+}
+
+.rezerwacja_potwierdzenie p:last-child {
+  margin: 0;
+}
+
+/* Link z akordeonu uslug do osobnej podstrony zabiegu. */
+.service-item_more {
+  margin: 0 0 18px;
+  font-size: 15px;
+}
+.service-item_more a {
+  color: var(--primitive-color--primary-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

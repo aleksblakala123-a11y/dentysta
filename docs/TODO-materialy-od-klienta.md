@@ -1,71 +1,117 @@
 # TODO: CLIENT CONFIRMATION - materialy do uzupelnienia
 
-Stan na 23.08.2026. Lista rzeczy, ktorych **nie wolno wymyslic** - musza przyjsc
-od gabinetu. Do czasu ich dostarczenia strona dziala, ale sekcja zespolu opiera sie
-na inicjalach zamiast twarzy, a to najslabszy punkt strony budujacej zaufanie.
+Stan na 24.08.2026. Lista rzeczy, ktorych **nie wolno wymyslic** - musza przyjsc
+od gabinetu albo zostac przez gabinet potwierdzone.
 
 ---
 
-## 1. Zdjecia lekarzy (priorytet najwyzszy)
+## 1. Zdjecia lekarzy
 
-Piec kart w sekcji "Poznaj lekarzy Amico Dental" (`about.html`) pokazuje kolka
-z inicjalami: JM, MM, JK, IB, AG. Markup i CSS sa juz przygotowane pod podmiane -
-patrz komentarz przy pierwszej karcie w `about.html` oraz `.team-avatar_foto`
-na koncu `assets/css/amico.css`.
+| Lekarz | Stan |
+|---|---|
+| dr n. med. Jacek Majewski | **zdjecie jest** - kadr ze strony gabinetu |
+| lek. stom. Malgorzata Majewska | **zdjecie jest** - kadr ze strony gabinetu |
+| lek. stom. Julita Kosior | TODO: CLIENT CONFIRMATION |
+| lek. stom. Ilona Bednarska | TODO: CLIENT CONFIRMATION |
+| lek. stom. Anna Galazka-Wojcik | TODO: CLIENT CONFIRMATION |
 
-| Lekarz | Inicjaly | Zdjecie |
-|---|---|---|
-| dr n. med. Jacek Majewski | JM | TODO: CLIENT CONFIRMATION |
-| lek. stom. Malgorzata Majewska | MM | TODO: CLIENT CONFIRMATION |
-| lek. stom. Julita Kosior | JK | TODO: CLIENT CONFIRMATION |
-| lek. stom. Ilona Bednarska | IB | TODO: CLIENT CONFIRMATION |
-| lek. stom. Anna Galazka-Wojcik | AG | TODO: CLIENT CONFIRMATION |
+### Skad pochodza dwa istniejace zdjecia
 
-Wymagania techniczne:
+Ze zdjecia `assets/images/mm_jm_amicodental.jpg` na stronie gabinetu
+(amicodental.pl), podpisanego tam jako "Malgorzata Majewska i Jacek Majewski".
+Jest to jeden kadr poziomy 537x278 z dwiema osobami; zostal przyciety na dwa
+portrety 3:4 po 208x278.
 
-- kadr **pionowy 3:4**, zrodlo minimum 600x800 px (box na karcie to 373x500 px
-  przy 1280 px viewportu, wiec 600x800 starcza takze na ekrany 2x)
-- jednolite tlo i podobny kadr dla calej piatki - piec roznych stylow zdjec
-  wyglada gorzej niz piec spojnych inicjalow
-- nazewnictwo zgodne z konwencja repo: `assets/img/lekarz-imie-nazwisko.jpg`
-  + warianty `assets/img/opt/lekarz-imie-nazwisko-{400,800}w.webp`
-- `alt` = imie i nazwisko + specjalizacja, np.
-  `alt="dr n. med. Jacek Majewski - chirurgia, protetyka"`
+**Do potwierdzenia przed uruchomieniem - nie jest to formalnosc:**
 
-**Nie podstawiac zdjec stockowych.** Na stronie "poznaj naszych lekarzy" zdjecie
-obcej osoby to wprowadzenie pacjenta w blad co do tego, kto go bedzie leczyl.
-Inicjaly sa uczciwe, stock nie jest.
+- **zgoda na wizerunek.** To sa zdjecia konkretnych, rozpoznawalnych osob.
+  Fakt, ze zdjecie jest publiczne na ich wlasnej stronie, nie jest zgoda na
+  uzycie go gdzie indziej. Wystarczy ustne potwierdzenie od gabinetu, ale musi
+  paść.
+- **prawa do samej fotografii.** Zdjecie zrobil ktos - fotograf albo gabinet.
+  Jesli fotograf, to on ma prawa autorskie i gabinet moze nie miec prawa
+  przekazac ich dalej.
+
+Dopoki to nie jest potwierdzone, zdjecia sa uzasadnione **wylacznie** jako
+element wersji demonstracyjnej pokazywanej temu gabinetowi. Wersja demo ma
+`noindex` na wszystkich stronach.
+
+### Wymagania na docelowe zdjecia
+
+Obecne kadry maja 208x278 px, a kafelek renderuje sie w 343x460 (mobile) i
+373x500 (desktop). To znaczy **powiekszenie okolo 1,7x** - zdjecia sa miekkie.
+Dzialaja jako dowod, ze sekcja jest gotowa, ale nie jako material docelowy.
+
+- kadr **pionowy 3:4**, zrodlo minimum 600x800 px
+- jednolite tlo i podobny kadr dla calej piatki
+- nazewnictwo: `assets/img/lekarz-imie-nazwisko.jpg` + `assets/img/opt/*.webp`
+- `alt` = imie i nazwisko + specjalizacja
+
+**Nie podstawiac zdjec stockowych.** W `assets/img/opt/` lezaly kiedys pliki
+`gen_team-image-*` - wygenerowane twarze obcych ludzi podstawione pod nazwiska
+prawdziwych lekarzy. Commit `a64256e` celowo je usunal, a `657c8fe` skasowal
+sieroty. Nie przywracac.
 
 ---
 
-## 2. Dane zawodowe lekarzy
+## 2. Formularz zamawiania wizyty - brak backendu
 
-Obecnie kazda karta ma tylko nazwisko i jedna linijke specjalizacji. Do uzupelnienia
-dla kazdego z piatki:
+`rezerwacja.html` dziala, waliduje pola i sklada gotowa wiadomosc, ale strona
+jest statyczna, wiec **nic nie wysyla w tle** - otwiera program pocztowy
+uzytkownika. Jest to napisane wprost pod przyciskiem, zeby nikt nie czekal na
+potwierdzenie, ktore nie przyjdzie.
 
-- numer **PWZ** (prawo wykonywania zawodu) - w Polsce podnosi wiarygodnosc
-  i jest oczekiwany przez czesc pacjentow
+**Przed uruchomieniem trzeba podpiac prawdziwy endpoint.** Opcje:
+
+- skrypt PHP na hostingu gabinetu (stara strona ma wlasny backend, wiec hosting
+  to obsluguje),
+- usluga zewnetrzna typu Formspree albo Netlify Forms.
+
+W obu przypadkach zmienia sie jedna rzecz w `rezerwacja.html`: zamiast budowac
+`mailto:` robimy `fetch` POST-em. Walidacja, komunikaty bledow i dostepnosc
+zostaja bez zmian - patrz komentarz w skrypcie na dole tego pliku.
+
+**Do ustalenia z gabinetem:** na jaki adres maja trafiac zgloszenia i kto je
+odbiera. Formularz zbiera dane osobowe (imie, telefon, e-mail), wiec potrzebna
+jest tez zgodnosc z polityka prywatnosci - checkbox linkuje do `privacy.html`,
+ale tresc tej polityki powinna zostac sprawdzona pod katem formularza.
+
+---
+
+## 3. Dane zawodowe lekarzy
+
+Do uzupelnienia dla kazdego z piatki:
+
+- numer **PWZ** (prawo wykonywania zawodu)
 - uczelnia i rok dyplomu
 - staz pracy
 - jezyki obce, w ktorych przyjmuje
 - szkolenia i certyfikaty warte pokazania
 
-Te dane sa tez potrzebne do rozbudowy `Person` w structured data - obecnie
-w JSON-LD sa tylko `name`, `jobTitle` i specjalizacja, bo tylko tyle wynika
-z tresci strony.
+Potrzebne takze do rozbudowy `Person` w danych strukturalnych - obecnie sa tam
+`name`, `jobTitle` i `image` dla dwoch osob, bo tylko tyle wynika z tresci.
 
 ---
 
-## 3. Do decyzji wlasciciela strony (nie material od klienta)
+## 4. Tresc podstron zabiegow
 
-Ustalenia z audytu, ktore czekaja na decyzje, bo zmieniaja zachowanie strony:
+Osiem podstron (`uslugi-*.html`) zawiera zakres zabiegow przepisany z
+`service.html` i odnosniki do wlasciwych grup w cenniku. **Nie ma tam opisow
+medycznych** - zadnych wyjasnien, wskazan ani przebiegu leczenia, bo takich
+tresci nie ma w repo i nie wolno ich wymyslac.
 
-- **Karty lekarzy sa self-linkami.** Kazda karta ma dwa `<a href="about.html">`
-  (jeden na awatarze, jeden na nazwisku) - czyli na stronie "O nas" linkuja
-  same do siebie. 10 linkow, ktore nic nie robia. Docelowo powinny prowadzic
-  do podstron `/zespol/imie-nazwisko`, albo przestac byc linkami.
+Stara strona gabinetu ma opisy dla pietnastu zabiegow. Do decyzji: przepisac je
+za zgoda gabinetu czy zamowic nowe teksty. Kazdy opis powinien przejsc przez
+osobe z uprawnieniami - to tresc medyczna.
+
+---
+
+## 5. Do decyzji wlasciciela strony
+
+- **Karty lekarzy sa self-linkami.** Kazda ma dwa `<a href="about.html">` -
+  na stronie "O nas" linkuja same do siebie. Docelowo powinny prowadzic do
+  podstron `/zespol/imie-nazwisko` albo przestac byc linkami.
 - **`aria-label="doctor's profile"`** - angielski opis na polskiej stronie,
-  10 wystapien w `about.html` i 3 w `index.html`. Do poprawy przy okazji
-  decyzji o self-linkach, bo obie zmiany dotykaja tego samego markupu.
-- Nazwy klas `team-menmber_name` i `team-menuber_designation` zawieraja
-  dwie rozne literowki z Webflow. Zmiana wymaga ruszenia CSS i HTML naraz.
+  10x w `about.html`, 3x w `index.html`.
+- Nazwy klas `team-menmber_name` i `team-menuber_designation` zawieraja dwie
+  rozne literowki z Webflow.
