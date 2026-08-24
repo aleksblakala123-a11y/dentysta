@@ -6696,3 +6696,46 @@ html:has(.w-nav-button.w--open) .cta-mobilne {
 .link-tresc:hover {
   text-decoration-thickness: 2px;
 }
+
+/* ===== Zlepiajace sie slowa w naglowkach artykulow =====
+   Zgloszenie: "w mitach nie ma spacji po slowach". Potwierdzone pomiarem.
+
+   Przyczyna: letter-spacing jest doliczany do KAZDEGO znaku, takze do spacji.
+   Tracking jest tu w pikselach, a rozmiary naglowkow zmieniaja sie z breakpointem,
+   wiec ta sama wartosc zjada tym wieksza czesc odstepu, im mniejszy font.
+
+   Zmierzone na blog/mity-o-zebach.html przy 375 px (szerokosc spacji policzona
+   przez Range, naturalna = to samo z letter-spacing: normal):
+
+     element              font   tracking   spacja   naturalna   ubytek
+     .article-body h3     18px   -2.4px     1.61px   4.01px      -60%
+     .article-title       28px   -2px       4.06px   6.06px      -33%
+     .article-body h2     22px   -0.96px    3.94px   4.90px      -20%
+     .article-body p      18px   -0.36px    3.76px   4.12px       -9%
+
+   Przy 1.61 px odstepu na 18-punktowym tekscie slowa faktycznie sie stykaja.
+   Ubytek rowna sie co do piksela wartosci trackingu, co potwierdza mechanizm.
+
+   Naprawa przez word-spacing, a nie przez rozluznienie letter-spacing: ciasny
+   tracking liter jest tu zamierzony i wyglada dobrze, zepsute sa tylko odstepy
+   miedzy slowami. word-spacing w em, zeby skalowal sie razem z fontem i dzialal
+   na kazdym breakpoincie - inaczej wrocilby ten sam blad, tylko gdzie indziej.
+
+   Wartosci dobrane tak, zeby na obu breakpointach spacja wypadla w przedziale
+   0.185-0.25 em przy naturalnej 0.22 em. Naglowkow stron marketingowych nie
+   ruszamy - tam zmierzone 0.172 em i tekst sie nie zlepia. */
+
+.article-title,
+.h2-as-h1-size {
+  word-spacing: .055em;
+}
+
+.article-body h2,
+.article-cta_title,
+.article-related_title {
+  word-spacing: .07em;
+}
+
+.article-body h3 {
+  word-spacing: .1em;
+}

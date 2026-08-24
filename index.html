@@ -50,7 +50,7 @@
         </script>
         <link href="assets/fonts/sora-latin.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
         <link href="assets/fonts/sora-latin-ext.woff2" as="font" type="font/woff2" rel="preload" crossorigin=""/>
-        <link href="assets/css/amico.css?v=20260823l" rel="stylesheet" type="text/css"/>
+        <link href="assets/css/amico.css?v=20260823m" rel="stylesheet" type="text/css"/>
         <noscript><style>[data-w-id]{opacity:1!important;transform:none!important;}</style></noscript>
         <script type="text/javascript">
             !function(o, c) {
@@ -2261,5 +2261,86 @@
         <span>Zadzwoń: 81 458 00 29</span>
     </a>
 </div>
+<script>
+/* Poziomy przesuw kafelkow uslug, sterowany scrollem.
+   REGRESJA PO USUNIECIU WEBFLOW: ten ruch napedzala interakcja IX2. Po jej
+   usunieciu zostawal sam wybieg - 3200 px pustego przewijania, na ktorym nic
+   sie nie ruszalo, a potem strona po prostu jechala dalej w dol.
+
+   Zmierzone na wersji sprzed zmian (c7fbd8b), zeby odtworzyc to samo:
+     desktop 1280:  wybieg 3200, kamera 904, track 4296, wrap 1160 -> przesuw 3136
+     mobile   375:  wybieg 1624, kamera 668, track 1367, wrap  343 -> przesuw 1024
+   Na obu szerokosciach IX2 konczyl ruch dokladnie na nadmiarze tracku, czyli
+   ostatni kafelek ladowal rowno z prawa krawedzia - i tak samo robi ten skrypt.
+
+   Dwie pary trigger/kamera, bo uklad je podmienia: ponizej 992 px sticky
+   przejmuje .scroll-mobile_camera (top 3vh), a .service_sticky-camera schodzi
+   do position:relative. Zamiast zgadywac breakpoint, sprawdzamy ktora kamera
+   JEST w danej chwili sticky - dzieki temu zmiana breakpointu w CSS niczego tu
+   nie zepsuje.
+
+   Postep liczymy przez cala faze przyklejenia (wysokosc wybiegu minus wysokosc
+   kamery), wiec kafelki dojezdzaja na koniec dokladnie wtedy, gdy kamera sie
+   odkleja. IX2 konczyl ruch okolo 10% pozniej, juz po odklejeniu - czyli ostatni
+   fragment przesuwu odbywal sie, gdy sekcja odjezdzala. To bylo widac jako
+   szarpniecie i tego nie odtwarzam.
+
+   Bez wygladzania i bez wlasnej animacji - transform jest zwiazany 1:1 z pozycja
+   scrolla, wiec nie ma tu ruchu, ktory dzialby sie sam. */
+(function () {
+  var track = document.querySelector('.scroll_track');
+  var wrap = document.querySelector('.service_wrap');
+  if (!track || !wrap) return;
+
+  var pary = [
+    ['.scroll-mobile_trigger', '.scroll-mobile_camera'],
+    ['.service_sticky-trigger', '.service_sticky-camera']
+  ];
+
+  var trigger = null, kamera = null;
+  var maxPrzesuw = 0, gora = 0, dystans = 1, czekaNaKlatke = false;
+
+  function przelicz() {
+    trigger = null;
+    kamera = null;
+    for (var i = 0; i < pary.length; i++) {
+      var t = document.querySelector(pary[i][0]);
+      var k = document.querySelector(pary[i][1]);
+      if (t && k && getComputedStyle(k).position === 'sticky') { trigger = t; kamera = k; break; }
+    }
+    maxPrzesuw = Math.max(0, track.scrollWidth - wrap.clientWidth);
+    if (trigger && kamera) {
+      gora = parseFloat(getComputedStyle(kamera).top) || 0;
+      dystans = Math.max(1, trigger.offsetHeight - kamera.offsetHeight);
+    }
+    rysuj();
+  }
+
+  function rysuj() {
+    /* Brak sticky albo tresc miesci sie w kadrze - zostawiamy uklad w spokoju. */
+    if (!trigger || !kamera || maxPrzesuw === 0) {
+      track.style.transform = '';
+      return;
+    }
+    var p = (gora - trigger.getBoundingClientRect().top) / dystans;
+    if (p < 0) p = 0;
+    else if (p > 1) p = 1;
+    track.style.transform = 'translate3d(' + (-p * maxPrzesuw).toFixed(1) + 'px, 0px, 0px)';
+  }
+
+  function naScroll() {
+    if (czekaNaKlatke) return;
+    czekaNaKlatke = true;
+    requestAnimationFrame(function () { czekaNaKlatke = false; rysuj(); });
+  }
+
+  window.addEventListener('scroll', naScroll, { passive: true });
+  window.addEventListener('resize', przelicz);
+  /* Po zaladowaniu obrazkow i fontow szerokosc tracku sie zmienia. */
+  window.addEventListener('load', przelicz);
+
+  przelicz();
+})();
+</script>
 </body>
 </html>
